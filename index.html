@@ -22,9 +22,16 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;min-height:100%}
-body{background:radial-gradient(1200px 600px at 50% -200px,#1b3d72 0%,var(--bg) 60%) fixed}
+html{background:var(--bg)}
+body{min-height:100vh;min-height:100dvh;background:radial-gradient(1200px 600px at 50% -200px,#1b3d72 0%,var(--bg) 60%) no-repeat,var(--bg)}
+body.inquiz .top{display:none}
+#quiz{flex:1;display:flex;flex-direction:column}
+#quiz .acts{margin-top:auto;padding-top:16px}
+#quiz .qtext{font-size:20px}
+#quiz .qtag{align-self:flex-start}
+#quiz .opt{padding:16px}
 button{font:inherit;color:inherit;border:0;cursor:pointer;background:none}
-.wrap{max-width:640px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(60px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left))}
+.wrap{max-width:640px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
 html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 h1,h2,h3{font-family:Sora,Inter,sans-serif}
 .top{display:flex;align-items:center;gap:12px;margin-bottom:18px}
@@ -446,7 +453,7 @@ function touchStreak(){const t=today();if(S.last===t)return;const y=new Date();y
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("on"),2200)}
 function flyXp(n,el){if(!el)return;const r=el.getBoundingClientRect();const f=document.createElement("div");f.className="xpfly";f.textContent="+"+n+" XP";f.style.left=(r.right-80)+"px";f.style.top=(r.top)+"px";document.body.appendChild(f);setTimeout(()=>f.remove(),1000)}
 function addXp(n,el){const before=rankOf(S.xp);S.xp+=n;save();flyXp(n,el);const after=rankOf(S.xp);if(after>before)setTimeout(()=>toast(RANKS[after].i+" Előléptetés: "+RANKS[after].n+"!"),400)}
-function show(id){["home","quiz","result"].forEach(s=>$(s).classList.toggle("hide",s!==id));window.scrollTo(0,0)}
+function show(id){["home","quiz","result"].forEach(s=>$(s).classList.toggle("hide",s!==id));document.body.classList.toggle("inquiz",id!=="home");window.scrollTo(0,0)}
 
 function renderHome(){
  const r=rankOf(S.xp),cur=RANKS[r],nx=RANKS[r+1];
