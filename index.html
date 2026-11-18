@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#081629">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Határőr Akadémia">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<title>Határőr Akadémia – Frontex felkészítő</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#081629; --bg2:#0d2240; --card:#122b4f; --card2:#183660; --line:#24467a;
+  --text:#eaf1fb; --muted:#9db3d3; --gold:#f5c542; --gold2:#d9a514;
+  --blue:#3d7bf0; --green:#2fbf71; --red:#ef5a5a; --amber:#f0a23d;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;min-height:100%}
+body{background:radial-gradient(1200px 600px at 50% -200px,#1b3d72 0%,var(--bg) 60%) fixed}
+button{font:inherit;color:inherit;border:0;cursor:pointer;background:none}
+.wrap{max-width:640px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(60px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left))}
+html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+h1,h2,h3{font-family:Sora,Inter,sans-serif}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.logo{width:44px;height:44px;flex:none}
+.top h1{font-size:20px;font-weight:800;letter-spacing:.2px}
+.top small{display:block;color:var(--muted);font-size:12px;font-weight:500}
+.card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:18px;padding:16px}
+.rank{display:flex;gap:14px;align-items:center}
+.badge{width:64px;height:64px;flex:none;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#ffe08a,var(--gold2));color:#2a1d00;font-size:28px;box-shadow:0 0 0 4px #0008,0 0 24px #f5c54255}
+.rank h2{font-size:18px}
+.rank .sub{color:var(--muted);font-size:13px;margin-top:2px}
+.bar{height:10px;border-radius:99px;background:#0a1a33;overflow:hidden;margin-top:8px;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--gold2),var(--gold));border-radius:99px;transition:width .6s}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.stat{background:#0a1a33;border:1px solid var(--line);border-radius:12px;padding:8px;text-align:center}
+.stat b{display:block;font-family:Sora;font-size:18px}
+.stat span{font-size:11px;color:var(--muted)}
+.sec{margin:22px 0 10px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:600}
+.modes{display:grid;gap:10px}
+.mode{display:flex;align-items:center;gap:14px;text-align:left;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--card);transition:transform .15s,border-color .15s}
+.mode:active{transform:scale(.98)}
+.mode:hover{border-color:var(--blue)}
+.mode .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:22px;flex:none}
+.mode b{display:block;font-family:Sora;font-size:15px}
+.mode span{font-size:13px;color:var(--muted)}
+.topics{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.topic{padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--card);text-align:left}
+.topic .wk{font-size:11px;color:var(--gold);font-weight:600;letter-spacing:.5px}
+.topic b{display:block;font-size:14px;margin:3px 0 8px;line-height:1.25;min-height:35px}
+.topic .bar{height:7px;margin-top:0}
+.topic .pc{font-size:11px;color:var(--muted);margin-top:5px}
+.hide{display:none!important}
+/* quiz */
+.qhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.x{width:38px;height:38px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-size:18px}
+.prog{flex:1}
+.prog .bar{margin:0}
+.prog .lbl{font-size:12px;color:var(--muted);margin-top:4px;display:flex;justify-content:space-between}
+.timer{min-width:62px;text-align:center;font-family:Sora;font-weight:700;padding:8px 10px;border-radius:12px;background:var(--card);border:1px solid var(--line)}
+.timer.warn{color:var(--red);border-color:var(--red);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.55}}
+.combo{font-size:12px;color:var(--gold);height:16px;margin-bottom:6px;font-weight:600}
+.qtag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:99px;background:#0a1a33;border:1px solid var(--line);color:var(--muted);margin-bottom:10px}
+.qtext{font-size:18px;line-height:1.45;font-weight:600;margin-bottom:16px}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;padding:14px;border-radius:14px;background:var(--card);border:1.5px solid var(--line);font-size:15px;line-height:1.4;transition:border-color .15s,background .15s}
+.opt .k{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:#0a1a33;font-weight:700;font-size:13px;flex:none}
+.opt:hover:not(:disabled){border-color:var(--blue)}
+.opt.sel{border-color:var(--blue);background:#17386b}
+.opt.ok{border-color:var(--green);background:#123f33}
+.opt.ok .k{background:var(--green);color:#03140c}
+.opt.bad{border-color:var(--red);background:#45202a}
+.opt.bad .k{background:var(--red);color:#1d0505}
+.opt:disabled{cursor:default}
+.fb{margin-top:14px;padding:14px;border-radius:14px;border:1px solid var(--line);background:#0a1a33;font-size:14px;line-height:1.5}
+.fb h3{font-size:15px;margin-bottom:4px}
+.fb.ok h3{color:var(--green)} .fb.bad h3{color:var(--red)} .fb.skip h3{color:var(--amber)}
+.acts{display:flex;gap:10px;margin-top:14px}
+.btn{flex:1;padding:14px;border-radius:14px;font-weight:700;font-family:Sora;font-size:15px;background:linear-gradient(180deg,var(--gold),var(--gold2));color:#231800}
+.btn.ghost{background:var(--card);color:var(--text);border:1px solid var(--line)}
+.btn:disabled{opacity:.4}
+.nav{display:flex;flex-wrap:wrap;gap:5px;margin-top:16px}
+.nav button{width:26px;height:26px;border-radius:7px;font-size:10px;background:#0a1a33;border:1px solid var(--line);color:var(--muted)}
+.nav button.ans{background:#17386b;color:var(--text);border-color:var(--blue)}
+.nav button.cur{outline:2px solid var(--gold)}
+/* result */
+.big{text-align:center;padding:24px 16px}
+.big .medal{font-size:56px}
+.big h2{font-size:24px;margin:6px 0 4px}
+.big .score{font-family:Sora;font-size:44px;font-weight:800;color:var(--gold)}
+.big p{color:var(--muted);font-size:14px}
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.rev{margin-top:10px;padding:12px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-size:14px;line-height:1.45}
+.rev .q{font-weight:600;margin-bottom:6px}
+.rev .a{color:var(--green)} .rev .y{color:var(--red)} .rev .e{color:var(--muted);margin-top:6px;font-size:13px}
+.toast{position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-120px);background:linear-gradient(180deg,var(--gold),var(--gold2));color:#231800;padding:12px 18px;border-radius:14px;font-family:Sora;font-weight:700;box-shadow:0 10px 30px #0008;transition:transform .4s;z-index:9;text-align:center}
+.toast.on{transform:translateX(-50%) translateY(0)}
+.xpfly{position:fixed;font-family:Sora;font-weight:800;color:var(--gold);pointer-events:none;animation:fly 1s forwards;z-index:8}
+@keyframes fly{to{transform:translateY(-60px);opacity:0}}
+.foot{margin-top:24px;text-align:center;font-size:12px;color:var(--muted)}
+.reset{color:var(--muted);text-decoration:underline;font-size:12px;margin-top:6px}
+.modal{position:fixed;inset:0;background:#000a;display:grid;place-items:center;z-index:10;padding:20px}
+.modal .card{max-width:380px;width:100%}
+.modal p{color:var(--muted);font-size:14px;margin:8px 0 14px;line-height:1.45}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#d9a514"/></linearGradient></defs><path d="M24 3 42 10v13c0 11-7.5 19-18 22C13.5 42 6 34 6 23V10z" fill="#122b4f" stroke="url(#g)" stroke-width="2.5"/><g fill="url(#g)"><circle cx="24" cy="13" r="1.6"/><circle cx="31" cy="16" r="1.6"/><circle cx="33" cy="23" r="1.6"/><circle cx="31" cy="30" r="1.6"/><circle cx="24" cy="33" r="1.6"/><circle cx="17" cy="30" r="1.6"/><circle cx="15" cy="23" r="1.6"/><circle cx="17" cy="16" r="1.6"/></g></svg>
+    <div><h1>Határőr Akadémia</h1><small>Frontex tudásteszt · 2027. január 12.</small></div>
+  </div>
+
+  <!-- HOME -->
+  <section id="home">
+    <div class="card">
+      <div class="rank">
+        <div class="badge" id="rIcon">🎖️</div>
+        <div style="flex:1">
+          <h2 id="rName">Kadét</h2>
+          <div class="sub" id="rNext">0 / 100 XP a következő rangig</div>
+          <div class="bar"><i id="rBar" style="width:0%"></i></div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="sXp">0</b><span>összes XP</span></div>
+        <div class="stat"><b id="sStreak">0🔥</b><span>napos sorozat</span></div>
+        <div class="stat"><b id="sDays">–</b><span>nap a vizsgáig</span></div>
+      </div>
+    </div>
+
+    <div class="sec">Küldetések</div>
+    <div class="modes">
+      <button class="mode" data-mode="blitz"><div class="ic" style="background:#3a2a07">⚡</div><div><b>Villámkör</b><span>10 kérdés, 42 mp/kérdés, félpontos levonással</span></div></button>
+      <button class="mode" data-mode="exam"><div class="ic" style="background:#0f2e5e">🎯</div><div><b>Vizsgaszimuláció</b><span>50 kérdés, 35 perc, pontszám 10-ből</span></div></button>
+      <button class="mode" data-mode="wrong"><div class="ic" style="background:#3d1520">🩹</div><div><b>Hibajavító bevetés</b><span id="wrongLbl">A rosszul megválaszolt kérdések újra</span></div></button>
+    </div>
+
+    <div class="sec">Kiképzési modulok · gyakorlás magyarázattal</div>
+    <div class="topics" id="topics"></div>
+
+    <div class="foot">A kérdések angolul vannak, ahogy a vizsgán.<br>A haladásod ebben a böngészőben marad meg.<br><button class="reset" id="resetBtn">Haladás törlése</button></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="hide">
+    <div class="qhead">
+      <button class="x" id="quitBtn" aria-label="Kilépés">✕</button>
+      <div class="prog"><div class="bar"><i id="qBar"></i></div><div class="lbl"><span id="qCount"></span><span id="qScore"></span></div></div>
+      <div class="timer hide" id="timer">0:42</div>
+    </div>
+    <div class="combo" id="combo"></div>
+    <div class="qtag" id="qTag"></div>
+    <div class="qtext" id="qText"></div>
+    <div class="opts" id="opts"></div>
+    <div id="fb"></div>
+    <div class="acts" id="acts"></div>
+    <div class="nav hide" id="nav"></div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result" class="hide"></section>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="modal hide" id="modal"><div class="card"><h3 id="mTitle"></h3><p id="mText"></p><div class="acts" style="margin-top:0"><button class="btn ghost" id="mNo">Mégse</button><button class="btn" id="mYes">Igen</button></div></div></div>
+
+<script>
+const TOPICS={
+ t1:{n:"EU-intézmények és a Frontex",w:"1. HÉT"},
+ t2:{n:"Műveletek és együttműködés",w:"2. HÉT"},
+ t3:{n:"Schengen és IT-rendszerek",w:"3. HÉT"},
+ t4:{n:"Visszatérés és Migrációs Paktum",w:"4. HÉT"},
+ t5:{n:"Etika és szakmaiság",w:"5. HÉT"},
+ t6:{n:"IKT és kiberbiztonság",w:"5. HÉT"},
+ t7:{n:"Alapjogok",w:"6. HÉT"},
+ t8:{n:"Stratégiák és EU-prioritások",w:"1–3. HÉT"},
+ t9:{n:"Tengeri jog: SOLAS és SAR",w:"2. HÉT"}
+};
+// a = index of correct option (options are shuffled on display)
+const Q=[
+{t:"t1",q:"Which regulation currently governs the European Border and Coast Guard Agency (Frontex)?",o:["Regulation (EU) 2019/1896","Regulation (EU) 2016/1624","Regulation (EU) No 1052/2013","Regulation (EC) No 2007/2004"],a:0,e:"Regulation 2019/1896 replaced Regulation 2016/1624 and incorporated the EUROSUR rules of Regulation 1052/2013."},
+{t:"t1",q:"Where is the headquarters of Frontex located?",o:["Warsaw","Brussels","Vienna","Luxembourg"],a:0,e:"The seat is in Warsaw, Poland, laid down in Regulation 2019/1896 and a Headquarters Agreement with Poland."},
+{t:"t1",q:"Up to how many operational staff should the standing corps include by 2027?",o:["10,000","5,000","3,000","20,000"],a:0,e:"Up to 10,000 by 2027: about 3,000 Frontex statutory staff (Category 1) and 7,000 seconded or deployed by Member States."},
+{t:"t1",q:"Category 1 of the European Border and Coast Guard standing corps consists of:",o:["statutory staff employed by the Agency","staff on long-term secondment from Member States","officers deployed by Member States for short-term deployments","the reserve for rapid reaction"],a:0,e:"Category 2 = long-term secondment, Category 3 = short-term deployment; the Category 4 reserve applied only until the end of 2024."},
+{t:"t1",q:"When deployed in a host Member State, standing corps team members act:",o:["under the instructions of the host Member State, in line with the operational plan","under the direct command of the Commission","only under the orders of the Frontex Executive Director","under the command of Europol"],a:0,e:"Team members operate under the command and control of the host Member State, according to the operational plan."},
+{t:"t1",q:"Which EU institution has the general right of legislative initiative?",o:["The European Commission","The Council of the EU","The European Parliament","The European Council"],a:0,e:"The Commission proposes legislation; Parliament and Council adopt it."},
+{t:"t1",q:"Under the ordinary legislative procedure, EU legislation is adopted by:",o:["the European Parliament and the Council jointly","the Commission alone","the European Council","the Council after merely consulting the Parliament"],a:0,e:"The ordinary legislative procedure puts Parliament and Council on an equal footing as co-legislators."},
+{t:"t1",q:"A directive is:",o:["binding as to the result to be achieved, leaving the choice of form and methods to national authorities","binding in its entirety and directly applicable in all Member States","binding only on those to whom it is addressed","a non-binding act"],a:0,e:"The second option describes a regulation, the third a decision, the fourth a recommendation or opinion."},
+{t:"t1",q:"Article 77 TFEU provides the legal basis for:",o:["border checks and the integrated management of external borders","the common immigration policy, including return","judicial cooperation in criminal matters","the common foreign and security policy"],a:0,e:"Article 77 covers borders; Article 79 covers immigration policy and return."},
+{t:"t1",q:"Who appoints the Executive Director of Frontex?",o:["The Management Board, from candidates proposed by the Commission","The European Parliament","The Council by qualified majority","The President of the Commission"],a:0,e:"The Management Board appoints the Executive Director from a list of candidates proposed by the Commission."},
+{t:"t1",q:"Which body ensures that EU law is interpreted and applied in the same way in all Member States?",o:["The Court of Justice of the European Union","The European Court of Human Rights","The European Court of Auditors","The European Ombudsman"],a:0,e:"The European Court of Human Rights in Strasbourg belongs to the Council of Europe, not the EU."},
+
+{t:"t2",q:"How often, at minimum, does Frontex carry out a vulnerability assessment of each Member State?",o:["Once a year","Every two years","Every five years","Only when a Member State requests it"],a:0,e:"The vulnerability assessment is carried out at least once a year, and may lead to recommendations with deadlines."},
+{t:"t2",q:"EUROSUR is best described as:",o:["a framework for information exchange and cooperation to improve situational awareness and reaction capability at the external borders","a database of visa applications","a fingerprint database of asylum applicants","an EU fund for border equipment"],a:0,e:"EUROSUR provides situational pictures and links national coordination centres with Frontex."},
+{t:"t2",q:"Deploying Frontex teams with executive powers on the territory of a non-EU country requires:",o:["a status agreement between the EU and that country","a working arrangement between Frontex and that country's authorities","only a decision of the Executive Director","only a recommendation of the Council"],a:0,e:"Working arrangements allow technical cooperation; executive powers abroad need an EU status agreement."},
+{t:"t2",q:"Which EU agency is responsible for the operational management of SIS, VIS, Eurodac and EES?",o:["eu-LISA","Europol","EUAA","ENISA"],a:0,e:"eu-LISA manages the large-scale IT systems in the area of freedom, security and justice."},
+{t:"t2",q:"Which EU agency supports Member States in asylum and reception matters?",o:["EUAA","FRA","Eurojust","EMSA"],a:0,e:"The European Union Agency for Asylum (EUAA) replaced EASO in 2022."},
+{t:"t2",q:"European cooperation on coast guard functions involves Frontex together with:",o:["EFCA and EMSA","Europol and Eurojust","EUAA and FRA","EASA and ERA"],a:0,e:"Frontex, the European Fisheries Control Agency and the European Maritime Safety Agency cooperate on coast guard functions."},
+{t:"t2",q:"A rapid border intervention is launched:",o:["at the request of a Member State facing specific and disproportionate challenges at its external borders","automatically every summer","at the request of a non-EU country","by the European Parliament"],a:0,e:"It is a time-limited deployment to support a Member State under urgent, exceptional pressure."},
+{t:"t2",q:"Which organisation is the UN Refugee Agency?",o:["UNHCR","IOM","OSCE","ICMPD"],a:0,e:"IOM is the UN migration agency; UNHCR protects refugees and is a key Frontex partner."},
+
+{t:"t3",q:"How long may a visa-exempt third-country national stay in the Schengen area?",o:["90 days in any 180-day period","90 days per calendar year","180 days in any 365-day period","30 days per entry"],a:0,e:"The 90/180 rule: count back 180 days from each day of stay."},
+{t:"t3",q:"Entry conditions for third-country nationals are set out in which article of the Schengen Borders Code?",o:["Article 6","Article 2","Article 25","Article 77"],a:0,e:"Article 6 of Regulation (EU) 2016/399 lists the entry conditions; Article 8 covers border checks."},
+{t:"t3",q:"Since the 2017 amendment of the Schengen Borders Code, persons enjoying the right of free movement crossing the external borders are:",o:["subject to systematic checks against relevant databases","exempt from any database check","checked only on a random basis","checked only when they leave the Schengen area"],a:0,e:"Regulation (EU) 2017/458 introduced systematic database checks on EU citizens at external borders."},
+{t:"t3",q:"The Entry/Exit System (EES) replaces:",o:["the manual stamping of passports of third-country nationals","the Visa Information System","the Schengen Information System","ETIAS"],a:0,e:"EES registers entries, exits and refusals of entry of short-stay third-country nationals; it began operations in October 2025."},
+{t:"t3",q:"Who will need an ETIAS travel authorisation once it starts operating?",o:["Visa-exempt third-country nationals","Visa-required third-country nationals","EU citizens","Holders of an EU residence permit"],a:0,e:"ETIAS is for visa-exempt travellers; it is not yet operating and the EU will announce its start date in advance."},
+{t:"t3",q:"Which system holds alerts on persons and objects, such as wanted persons and refusal-of-entry alerts?",o:["SIS","VIS","Eurodac","EES"],a:0,e:"The Schengen Information System is the main alert system for border and police authorities."},
+{t:"t3",q:"Temporary reintroduction of border control at internal borders is:",o:["decided by the Member State concerned, as a last resort, in case of a serious threat to public policy or internal security","decided by Frontex","decided by the Commission for all Member States","never allowed under the Schengen Borders Code"],a:0,e:"It must be exceptional, time-limited and proportionate; the 2024 amendment (EU) 2024/1717 updated these rules."},
+{t:"t3",q:"Eurodac primarily stores:",o:["biometric data of applicants for international protection and irregular migrants","visa application data","travel authorisation data","criminal records of EU citizens"],a:0,e:"The recast Eurodac Regulation (EU) 2024/1358 is part of the Migration Pact."},
+
+{t:"t4",q:"Under the Return Directive, the period for voluntary departure is normally:",o:["between 7 and 30 days","between 1 and 7 days","between 30 and 90 days","up to 6 months"],a:0,e:"Article 7 of Directive 2008/115/EC; it can be extended in individual cases."},
+{t:"t4",q:"What is the maximum period of detention for the purpose of removal under the Return Directive?",o:["6 months, extendable by up to 12 further months","30 days","3 months, not extendable","There is no maximum"],a:0,e:"Article 15: 6 months, extendable to 18 months in total in limited cases."},
+{t:"t4",q:"The length of an entry ban should, in principle, not exceed:",o:["5 years","1 year","10 years","20 years"],a:0,e:"It may exceed 5 years only if the person is a serious threat to public policy, public security or national security."},
+{t:"t4",q:"The Return Directive requires Member States to provide:",o:["an effective forced-return monitoring system","a Frontex escort on every return flight","an EUAA interview before every return","a European Return Order"],a:0,e:"Article 8(6). The European Return Order belongs to the new Return Regulation, not the 2008 Directive."},
+{t:"t4",q:"Who issues return decisions?",o:["The competent authorities of the Member States","Frontex","The European Commission","The Fundamental Rights Officer"],a:0,e:"Frontex supports Member States in returns but does not decide on the merits of return decisions."},
+{t:"t4",q:"Since when does the Pact on Migration and Asylum apply?",o:["12 June 2026","1 January 2025","14 November 2019","1 January 2027"],a:0,e:"The Pact legislation adopted in 2024 became applicable on 12 June 2026."},
+{t:"t4",q:"The Screening Regulation (EU) 2024/1356 applies, among others, to third-country nationals who:",o:["cross the external border in an unauthorised manner","hold a valid EU residence permit","are family members of EU citizens with valid documents","transit an airport with a valid visa"],a:0,e:"Screening also covers persons disembarked after search and rescue and those applying at a border crossing point without meeting entry conditions."},
+{t:"t4",q:"The new Return Regulation (political agreement in June 2026) is meant to:",o:["replace the Return Directive 2008/115/EC","replace the EBCG Regulation","abolish entry bans","transfer return decisions to Frontex"],a:0,e:"It creates a common European system for returns; it must still be formally adopted before entering into force."},
+
+{t:"t5",q:"During a deployment, a local official offers you an expensive gift for 'good cooperation'. You should:",o:["politely decline and report it according to the rules","accept it and tell no one","accept it if it is worth less than €500","share it with your team"],a:0,e:"Gifts linked to your duties threaten impartiality; follow the rules on gifts and report."},
+{t:"t5",q:"During a Frontex operation you see an officer use excessive force against a migrant. You should:",o:["report it without delay through the serious incident reporting procedure","ignore it because the officer is from another Member State","discuss it informally weeks later","post the video on social media"],a:0,e:"Every participant has a duty to report possible fundamental rights violations through official channels."},
+{t:"t5",q:"You realise a close relative has applied for a contract you are evaluating. You should:",o:["declare the conflict of interest and withdraw from the evaluation","evaluate it objectively without telling anyone","ask your relative to withdraw the bid","give the bid the lowest score to be safe"],a:0,e:"Conflicts of interest must be declared so the hierarchy can take measures."},
+{t:"t5",q:"What does OLAF investigate?",o:["Fraud, corruption and other illegal activities affecting the EU's financial interests","Asylum applications","Fundamental rights complaints about Frontex operations","Data breaches at national police forces"],a:0,e:"OLAF is the European Anti-Fraud Office; staff must report suspected fraud."},
+{t:"t5",q:"A journalist asks you for details of an ongoing operation. You should:",o:["refer them to the press office and not disclose operational information","give general information if they keep you anonymous","share everything because of the public interest","give them the documents off the record"],a:0,e:"Staff must respect confidentiality and speak to the media only when authorised."},
+{t:"t5",q:"Under the Frontex Code of Conduct, all participants in operational activities must:",o:["respect fundamental rights and human dignity","carry out any order, even an unlawful one","put speed ahead of procedural safeguards","avoid reporting incidents to protect the team"],a:0,e:"The Code requires lawful, professional, impartial conduct and respect for fundamental rights."},
+
+{t:"t6",q:"An email from 'IT support' asks you to confirm your password via a link. You should:",o:["not click the link and report the email to IT security","reply with your password","click the link to check whether it is genuine","forward it to colleagues"],a:0,e:"This is a typical phishing attempt; IT staff never ask for your password."},
+{t:"t6",q:"In Excel, which cell reference stays fixed when a formula is copied?",o:["$A$1","A1","A:1","#A1"],a:0,e:"The $ signs make both the column and the row absolute."},
+{t:"t6",q:"Which Excel function looks up a value in a table and returns a matching value?",o:["XLOOKUP","SUM","COUNT","CONCAT"],a:0,e:"XLOOKUP (or the older VLOOKUP) searches a range and returns the corresponding item."},
+{t:"t6",q:"Which format is best for sharing a final document that should not be easily edited?",o:["PDF","DOCX","TXT","XLSX"],a:0,e:"PDF keeps the layout and is not meant for editing."},
+{t:"t6",q:"Which password is the strongest?",o:["A long passphrase with mixed characters, unique to that account","Your name and year of birth","The same complex password for every account","123456!"],a:0,e:"Length and uniqueness matter most; reused passwords spread a single breach."},
+{t:"t6",q:"In Outlook, how do you email many recipients without revealing their addresses to each other?",o:["Put them in BCC","Put them in CC","Put them in To","Use Reply All"],a:0,e:"BCC (blind carbon copy) hides recipients from each other."},
+{t:"t6",q:"Under data protection rules, personal data must be:",o:["processed lawfully, for specified purposes, and kept no longer than necessary","kept indefinitely in case it is useful","shared freely between EU authorities","processed only on paper"],a:0,e:"Purpose limitation and storage limitation are core principles; EU bodies follow Regulation (EU) 2018/1725."},
+
+{t:"t7",q:"Which article of the EU Charter of Fundamental Rights prohibits collective expulsion and removal to a risk of the death penalty, torture or inhuman treatment?",o:["Article 19","Article 4","Article 47","Article 52"],a:0,e:"Article 19 contains non-refoulement; Article 4 prohibits torture; Article 47 is the right to an effective remedy."},
+{t:"t7",q:"The prohibition of torture in Article 3 ECHR is:",o:["absolute: no exception or derogation is allowed, even in an emergency","subject to limitations provided by law","suspended in times of war","applicable only to EU citizens"],a:0,e:"Article 3 is one of the absolute rights of the European Convention on Human Rights."},
+{t:"t7",q:"Who appoints the Frontex Fundamental Rights Officer?",o:["The Management Board","The Executive Director","The European Commission","The European Parliament"],a:0,e:"The Fundamental Rights Officer is appointed by the Management Board and is independent in their duties (Article 109)."},
+{t:"t7",q:"Which article of Regulation 2019/1896 establishes the complaints mechanism?",o:["Article 111","Article 46","Article 109","Article 32"],a:0,e:"Article 109 = Fundamental Rights Officer, 110 = monitors, 111 = complaints mechanism."},
+{t:"t7",q:"At least how many fundamental rights monitors must Frontex have under Regulation 2019/1896?",o:["40","10","100","400"],a:0,e:"Article 110 requires at least 40 fundamental rights monitors."},
+{t:"t7",q:"Under Article 46, the Executive Director must suspend or terminate an activity when:",o:["there are serious or likely to persist violations of fundamental rights or international protection obligations related to it","the operational budget is used up","a non-EU country asks for it","the weather makes patrolling difficult"],a:0,e:"Article 46 is a key fundamental rights safeguard; the Fundamental Rights Officer is consulted."},
+{t:"t7",q:"Who can submit a complaint under the Frontex complaints mechanism?",o:["Any person directly affected by the actions or failure to act of staff involved in a Frontex activity, or a party representing them","Only EU citizens","Only Member State authorities","Only NGOs registered in Brussels"],a:0,e:"The FRO checks admissibility; complaints about national officers are forwarded to the home Member State."},
+{t:"t7",q:"Article 33 of the 1951 Refugee Convention establishes:",o:["the principle of non-refoulement","the right to work","the right to family reunification","the definition of a stateless person"],a:0,e:"No refugee may be returned to a territory where their life or freedom would be threatened."},
+{t:"t7",q:"Rules for the surveillance of sea borders in Frontex-coordinated operations are laid down in:",o:["Regulation (EU) No 656/2014","Directive 2008/115/EC","Regulation (EU) 2018/1240","Regulation (EU) 2024/1351"],a:0,e:"Regulation 656/2014 covers interception, search and rescue, and disembarkation."},
+{t:"t7",q:"Article 24 of the EU Charter protects:",o:["the rights of the child, with the child's best interests as a primary consideration","the right to asylum","the protection of personal data","freedom of expression"],a:0,e:"Article 18 is the right to asylum; Article 8 is data protection; Article 11 is freedom of expression."},
+
+// ===== Bővítés: t1 =====
+{t:"t1",q:"The Frontex Management Board is composed of:",o:["one representative of each Member State and two representatives of the Commission","one representative of each Member State and one Member of the European Parliament","27 Members of the European Parliament","Commission representatives only"],a:0,e:"Schengen associated countries also take part, with limited voting rights."},
+{t:"t1",q:"Frontex was originally established by Council Regulation (EC) No 2007/2004 in:",o:["2004","1995","2011","2016"],a:0,e:"Established in 2004, operational from 2005; renamed European Border and Coast Guard Agency in 2016."},
+{t:"t1",q:"Which regulation first turned Frontex into the European Border and Coast Guard Agency?",o:["Regulation (EU) 2016/1624","Regulation (EU) 2019/1896","Regulation (EU) 2016/399","Regulation (EU) No 656/2014"],a:0,e:"2016/1624 created the European Border and Coast Guard; 2019/1896 replaced it with a stronger mandate."},
+{t:"t1",q:"The European Border and Coast Guard consists of:",o:["Frontex and the national authorities of Member States responsible for border management and return","Frontex alone","Frontex, Europol and Eurojust","the Commission's DG HOME"],a:0,e:"It is a shared responsibility: the Agency plus national border, coast guard (for border tasks) and return authorities."},
+{t:"t1",q:"To whom is Frontex accountable?",o:["The European Parliament and the Council","The European Court of Human Rights","The Member State hosting each operation","The UN Secretary-General"],a:0,e:"Regulation 2019/1896 states the Agency is accountable to the European Parliament and the Council."},
+{t:"t1",q:"Which of the following is a component of European integrated border management?",o:["Return of third-country nationals subject to return decisions","Issuing national passports","Setting customs tariffs","Allocating fisheries quotas"],a:0,e:"EIBM components include border control, search and rescue, risk analysis, cooperation, return and use of technology."},
+{t:"t1",q:"The European Council is composed of:",o:["the heads of state or government of the Member States, its President and the President of the Commission","the ministers of the Member States","the Members of the European Parliament","the Commissioners"],a:0,e:"Do not confuse it with the Council of the EU (ministers) or the Council of Europe (separate organisation)."},
+{t:"t1",q:"The Council of the European Union is made up of:",o:["government ministers from each Member State, by policy area","the heads of state or government","directly elected representatives","national judges"],a:0,e:"Justice and Home Affairs ministers meet in the JHA Council configuration."},
+{t:"t1",q:"Which EU institution audits the collection and use of EU funds?",o:["The European Court of Auditors","The Court of Justice of the EU","OLAF","The European Ombudsman"],a:0,e:"The Court of Auditors is the EU's external auditor, based in Luxembourg."},
+{t:"t1",q:"The European Ombudsman investigates complaints about:",o:["maladministration by EU institutions, bodies, offices and agencies","decisions of national courts","crimes committed by EU citizens","Member States' asylum decisions"],a:0,e:"The Ombudsman has opened several inquiries into Frontex, including on its complaints mechanism."},
+{t:"t1",q:"A regulation is:",o:["binding in its entirety and directly applicable in all Member States","binding only as to the result to be achieved","binding only on those to whom it is addressed","a non-binding opinion"],a:0,e:"Frontex rules (2019/1896) and the Schengen Borders Code are regulations, so no national transposition is needed."},
+{t:"t1",q:"A decision under Article 288 TFEU is:",o:["binding in its entirety; if it specifies addressees, binding only on them","never binding","binding only as to its objective","applicable only to EU staff"],a:0,e:"Article 288 TFEU lists regulations, directives, decisions, recommendations and opinions."},
+{t:"t1",q:"Which of these is a Schengen associated country rather than an EU Member State?",o:["Norway","Ireland","Croatia","Romania"],a:0,e:"Iceland, Norway, Switzerland and Liechtenstein are associated countries."},
+
+// ===== Bővítés: t2 =====
+{t:"t2",q:"The operational plan of a joint operation is agreed between:",o:["the Executive Director and the host Member State, in consultation with participating Member States","the Commission and the Council","the Fundamental Rights Officer and the European Parliament","Europol and Frontex"],a:0,e:"The plan sets out the organisation, tasks, command, reporting and fundamental rights safeguards."},
+{t:"t2",q:"Migration management support teams are typically deployed in:",o:["hotspot areas, together with other EU agencies","Frontex headquarters only","third countries without any agreement","national courts"],a:0,e:"They support screening, identification, registration and fingerprinting, often with EUAA and Europol."},
+{t:"t2",q:"What is CIRAM?",o:["The Common Integrated Risk Analysis Model","A Frontex surveillance drone","The EU visa database","A return flight booking tool"],a:0,e:"CIRAM is the common model used by Frontex and Member States for risk analysis."},
+{t:"t2",q:"Frontex liaison officers in Member States mainly:",o:["foster cooperation between the Agency and national authorities and support monitoring of the external borders","command national border guards","issue Schengen visas","decide on asylum claims"],a:0,e:"They also support the vulnerability assessment by gathering information."},
+{t:"t2",q:"Europol's main mandate is to:",o:["support Member States in preventing and combating serious crime, organised crime and terrorism","control the EU's external borders","decide on asylum applications","prosecute criminals before EU courts"],a:0,e:"Frontex and Europol cooperate closely on migrant smuggling and trafficking in human beings."},
+{t:"t2",q:"At national level, the EUROSUR situational picture is managed by:",o:["the National Coordination Centre","the national parliament","Frontex liaison officers","the European Commission"],a:0,e:"Each Member State has a National Coordination Centre linked to Frontex through EUROSUR."},
+{t:"t2",q:"If a Member State fails to act on vulnerability assessment measures or faces disproportionate pressure without requesting support, endangering Schengen, who decides that Frontex implements measures?",o:["The Council, on a proposal from the Commission","The Frontex Management Board","The European Parliament","The Court of Justice"],a:0,e:"This is the 'situation at the external borders requiring urgent action' procedure (Article 42)."},
+{t:"t2",q:"Which Interpol database is used at border checks to find stolen or lost travel documents?",o:["SLTD","SIS","VIS","ECRIS"],a:0,e:"Stolen and Lost Travel Documents (SLTD) is an Interpol database; SIS and VIS are EU systems."},
+{t:"t2",q:"Search and rescue operations at sea are coordinated by:",o:["the Maritime Rescue Coordination Centre responsible for the search and rescue region","Frontex headquarters","EMSA","the flag state of the vessel in distress"],a:0,e:"Frontex assets must assist persons in distress at sea, under the coordination of the competent MRCC."},
+{t:"t2",q:"Which EU agency trains law enforcement officials?",o:["CEPOL","EUAA","eu-LISA","FRA"],a:0,e:"CEPOL is the EU Agency for Law Enforcement Training, based in Budapest."},
+{t:"t2",q:"Eurojust supports:",o:["judicial cooperation in criminal matters between national authorities","border surveillance at sea","asylum reception","management of IT systems"],a:0,e:"Eurojust coordinates national prosecutors in cross-border cases."},
+{t:"t2",q:"Which organisation is the UN migration agency?",o:["IOM","UNHCR","UNODC","OHCHR"],a:0,e:"IOM often supports assisted voluntary return and reintegration."},
+{t:"t2",q:"A working arrangement between Frontex and a non-EU country:",o:["allows operational and technical cooperation, but not deployments with executive powers","allows standing corps officers to use executive powers there","is an international treaty signed by the Council","transfers border control to Frontex"],a:0,e:"Executive powers abroad need a status agreement concluded by the EU."},
+
+// ===== Bővítés: t3 =====
+{t:"t3",q:"How many countries are in the Schengen area?",o:["29","27","26","31"],a:0,e:"25 EU Member States plus Iceland, Norway, Switzerland and Liechtenstein; Bulgaria and Romania fully joined on 1 January 2025."},
+{t:"t3",q:"Which EU Member State is not part of the Schengen area?",o:["Ireland","Croatia","Romania","Bulgaria"],a:0,e:"Ireland has an opt-out; Cyprus is also not yet a full member."},
+{t:"t3",q:"From when did Bulgaria and Romania fully apply the Schengen rules, including at land borders?",o:["1 January 2025","31 March 2024","1 January 2023","1 January 2027"],a:0,e:"Air and sea internal border checks were lifted on 31 March 2024; land borders followed on 1 January 2025."},
+{t:"t3",q:"For entry, a third-country national's travel document must normally be:",o:["valid for at least 3 months after the intended date of departure and issued within the previous 10 years","valid for at least 1 month","valid for 12 months after entry","issued within the previous 5 years"],a:0,e:"Article 6(1)(a) of the Schengen Borders Code."},
+{t:"t3",q:"A refusal of entry must be:",o:["given by a substantiated decision stating the precise reasons, using the standard form","given orally only","decided by Frontex","approved by a court before it takes effect"],a:0,e:"Article 14 of the Schengen Borders Code; persons refused entry have the right to appeal."},
+{t:"t3",q:"An appeal against a refusal of entry:",o:["has no suspensive effect","automatically suspends the refusal","must be decided within 24 hours","is not allowed"],a:0,e:"Article 14(3) of the Schengen Borders Code."},
+{t:"t3",q:"External borders may, as a rule, be crossed only:",o:["at border crossing points during their fixed opening hours","anywhere, at any time","only at airports","only with a Frontex escort"],a:0,e:"Article 5 of the Schengen Borders Code; exceptions exist for special cases."},
+{t:"t3",q:"The Visa Information System (VIS) stores data on:",o:["visa applications and decisions, including biometrics","asylum applications","stolen vehicles","criminal convictions"],a:0,e:"VIS supports the common visa policy and checks at the external borders."},
+{t:"t3",q:"Schengen evaluations are carried out by:",o:["the Commission and the Member States jointly","Frontex alone","the European Parliament","national courts"],a:0,e:"The evaluation and monitoring mechanism is set out in Regulation (EU) 2022/922; Frontex contributes risk analyses."},
+{t:"t3",q:"Which interoperability component lets officers search several EU information systems at the same time?",o:["The European Search Portal (ESP)","The Multiple-Identity Detector (MID)","The Common Identity Repository (CIR)","ECRIS-TCN"],a:0,e:"MID detects multiple identities; CIR stores identity data; ESP is the single search interface."},
+{t:"t3",q:"A uniform Schengen visa for short stays is a:",o:["type C visa","type D visa","type A visa","national residence permit"],a:0,e:"Type A is the airport transit visa; type D is a national long-stay visa."},
+{t:"t3",q:"The rules on issuing Schengen short-stay visas are set out in:",o:["the Visa Code, Regulation (EC) No 810/2009","the Return Directive","the EBCG Regulation","the Eurodac Regulation"],a:0,e:"The Visa Code covers procedures and conditions for short-stay visas."},
+{t:"t3",q:"Thorough checks on third-country nationals at entry include verifying:",o:["the purpose of stay and sufficient means of subsistence","only the photo on the passport","the person's tax records","the person's employment history in detail"],a:0,e:"Article 8(3) of the Schengen Borders Code lists the elements of thorough checks."},
+
+// ===== Bővítés: t4 =====
+{t:"t4",q:"Member States may decide not to apply the Return Directive to third-country nationals who:",o:["are subject to a refusal of entry at the external border","hold a long-term resident status","are family members of EU citizens","are minors"],a:0,e:"Article 2(2)(a); minimum safeguards such as non-refoulement still apply."},
+{t:"t4",q:"When implementing the Return Directive, Member States must take due account of:",o:["the best interests of the child, family life and state of health, and respect non-refoulement","only the cost of the return","only the person's nationality","only the availability of flights"],a:0,e:"Article 5 of Directive 2008/115/EC."},
+{t:"t4",q:"Before removing an unaccompanied minor, authorities must be satisfied that the child:",o:["will be returned to a family member, a guardian or adequate reception facilities","has turned 16","agrees in writing","has a valid passport"],a:0,e:"Article 10 of the Return Directive."},
+{t:"t4",q:"Coercive measures during removal must be:",o:["a last resort, proportionate and not exceed reasonable force","used in every forced return","decided by the escort leader without limits","applied to all family members"],a:0,e:"Article 8(4) of the Return Directive; Frontex codes of conduct apply the same principle."},
+{t:"t4",q:"Detention for removal should, as a rule, take place:",o:["in specialised detention facilities; if in prison, separate from ordinary prisoners","in ordinary prison cells together with convicted criminals","in police cars","at Frontex headquarters"],a:0,e:"Article 16 of the Return Directive."},
+{t:"t4",q:"In a collecting return operation, the means of transport and escorts are provided by:",o:["the third country of return","the organising Member State","Frontex only","IOM"],a:0,e:"In national and joint return operations, Member States provide the escorts."},
+{t:"t4",q:"Which of these is one of the Frontex return pools?",o:["Forced-return monitors","Asylum judges","Consular officers","Customs officers"],a:0,e:"The pools include forced-return monitors, forced-return escorts and return specialists."},
+{t:"t4",q:"Under the Screening Regulation, screening at the external border must be completed within:",o:["7 days","24 hours","30 days","3 months"],a:0,e:"Screening within the territory must be completed within 3 days."},
+{t:"t4",q:"Under the Pact, the asylum border procedure lasts at most:",o:["12 weeks, including appeal","7 days","6 months","1 year"],a:0,e:"Asylum Procedures Regulation (EU) 2024/1348; the return border procedure is also limited to 12 weeks."},
+{t:"t4",q:"The Asylum and Migration Management Regulation (EU) 2024/1351 replaced:",o:["the Dublin III Regulation (EU) No 604/2013","the Return Directive","the Schengen Borders Code","the Visa Code"],a:0,e:"It sets responsibility rules and the new solidarity mechanism."},
+{t:"t4",q:"Under the recast Eurodac Regulation, fingerprints and facial images are taken from the age of:",o:["6","14","12","18"],a:0,e:"The age was lowered from 14 to 6 to help protect children."},
+{t:"t4",q:"Frontex can support Member States with:",o:["both voluntary and forced returns","only forced returns","only voluntary returns","no returns"],a:0,e:"Support includes pre-return activities, return operations and reintegration."},
+{t:"t4",q:"Under the Pact's solidarity mechanism, Member States can contribute by:",o:["relocation, financial contributions or alternative solidarity measures","only accepting relocated persons","only sending border guards","nothing; it is voluntary for all"],a:0,e:"The mechanism is mandatory but flexible as to the form of solidarity."},
+
+// ===== Bővítés: t5 =====
+{t:"t5",q:"If you receive an order you consider irregular, under the EU Staff Regulations you should first:",o:["inform your immediate superior, who may confirm the order in writing","refuse silently and leave the post","post about it online","carry it out without comment"],a:0,e:"If confirmed in writing, you carry it out unless it is manifestly illegal or breaches safety standards; then you go higher."},
+{t:"t5",q:"A staff member who reports serious irregularities in good faith through the proper channels:",o:["is protected against retaliation","can be disciplined for disloyalty","must first ask the media for advice","loses their job automatically"],a:0,e:"The Staff Regulations protect whistleblowers who act in good faith."},
+{t:"t5",q:"Outside working hours, during a deployment, you are expected to:",o:["behave in a way that does not damage the reputation of the Agency","do anything, as off-duty conduct does not matter","avoid all contact with local people","stay in your hotel at all times"],a:0,e:"Codes of conduct apply to behaviour that could reflect on the Agency, on and off duty."},
+{t:"t5",q:"Can you post photos of migrants from your operational area on your private social media?",o:["No: it breaches privacy, dignity and operational confidentiality","Yes, if faces are visible but names are hidden","Yes, after the operation ends","Yes, if colleagues agree"],a:0,e:"Personal data and dignity of persons met during operations must be protected."},
+{t:"t5",q:"The use of force by team members must be:",o:["necessary, proportionate and a last resort, in line with national and EU law","decided freely by each officer","used to speed up procedures","used whenever someone refuses to answer questions"],a:0,e:"Force and weapons are used in line with the host Member State's law and the operational plan."},
+{t:"t5",q:"Regarding alcohol, team members should:",o:["not consume it on duty and not report for duty under its influence","drink only small amounts on duty","follow local customs on duty","avoid it only on weekends"],a:0,e:"Fitness for duty is part of professional conduct."},
+{t:"t5",q:"Integrity in public service is best described as:",o:["acting honestly and consistently with your values and rules, even when no one is watching","following orders without question","maximising personal benefit within the rules","never admitting mistakes"],a:0,e:"Integrity covers honesty, impartiality, accountability and avoiding conflicts of interest."},
+{t:"t5",q:"You make a mistake that affects an ongoing case. The professional response is to:",o:["report it promptly and help correct it","hide it if no one noticed","blame a colleague","wait to see if anyone notices"],a:0,e:"Accountability means owning and correcting errors."},
+{t:"t5",q:"Team members must treat all persons:",o:["with respect and without discrimination on any ground","according to their nationality","differently depending on their religion","with suspicion by default"],a:0,e:"Non-discrimination is required by the Charter (Article 21) and Frontex codes of conduct."},
+{t:"t5",q:"Can you store migrants' personal data on your private phone for convenience?",o:["No, only in authorised systems and for authorised purposes","Yes, if the phone has a password","Yes, during the deployment only","Yes, if you delete it later"],a:0,e:"Data protection rules limit processing to lawful, specified purposes and secure systems."},
+{t:"t5",q:"Staff of EU agencies must carry out their duties:",o:["with the interests of the Union in mind, without seeking instructions from any government","following instructions from their home government","in favour of their home country","according to their personal political views"],a:0,e:"Independence and loyalty to the Union are core obligations in the Staff Regulations."},
+
+// ===== Bővítés: t6 =====
+{t:"t6",q:"Which keyboard shortcut undoes the last action in most Office programs?",o:["Ctrl + Z","Ctrl + Y","Ctrl + U","Ctrl + P"],a:0,e:"Ctrl + Y redoes, Ctrl + U underlines, Ctrl + P prints."},
+{t:"t6",q:"Which Excel function counts the cells that meet a condition?",o:["COUNTIF","SUM","AVERAGE","TODAY"],a:0,e:"Example: =COUNTIF(B2:B100,\"Refused\")."},
+{t:"t6",q:"In Excel, what does =IF(A2>90,\"Overstay\",\"OK\") do?",o:["Shows 'Overstay' if A2 is greater than 90, otherwise 'OK'","Always shows 'Overstay'","Adds 90 to A2","Counts cells above 90"],a:0,e:"IF returns one value when the condition is true and another when it is false."},
+{t:"t6",q:"Which Excel feature quickly summarises large data sets by categories?",o:["PivotTable","Spell check","Freeze panes","Page break"],a:0,e:"PivotTables group, count and sum data without formulas."},
+{t:"t6",q:"In Word, which feature shows each edit so others can accept or reject it?",o:["Track Changes","Format Painter","Page Layout","Mail Merge"],a:0,e:"Found on the Review tab."},
+{t:"t6",q:"To create an automatic table of contents in Word, you should:",o:["apply heading styles to the titles","type the page numbers manually","use bold text only","insert a text box"],a:0,e:"The table of contents is built from Heading 1, Heading 2 and other heading styles."},
+{t:"t6",q:"In PowerPoint, the feature that keeps a consistent design on all slides is:",o:["the Slide Master","the Notes pane","Slide Sorter","Presenter View"],a:0,e:"Changes to the Slide Master apply to all slides using its layouts."},
+{t:"t6",q:"Multi-factor authentication means:",o:["logging in with two or more different types of proof, such as a password and a phone code","using two passwords","logging in from two devices","changing your password twice a year"],a:0,e:"It protects the account even if the password is stolen."},
+{t:"t6",q:"You find an unknown USB stick in the office car park. You should:",o:["not plug it in and hand it to IT security","plug it in to find the owner","format it and keep it","plug it into a colleague's computer"],a:0,e:"Unknown USB devices are a common way to spread malware."},
+{t:"t6",q:"What is ransomware?",o:["Malware that encrypts files and demands payment to unlock them","A secure backup tool","An antivirus program","A password manager"],a:0,e:"Regular backups and caution with attachments are the best protection."},
+{t:"t6",q:"Before leaving your desk, you should:",o:["lock your computer screen (e.g. Windows key + L)","leave it on so colleagues can use it","turn off the monitor only","log out of email only"],a:0,e:"A clean desk and locked screen protect sensitive information."},
+{t:"t6",q:"On public Wi-Fi, the safest way to access work systems is:",o:["through the organisation's VPN, or not at all","with no protection, as public Wi-Fi is safe","by sharing your screen","by turning off your firewall"],a:0,e:"Public networks can be monitored by attackers."},
+{t:"t6",q:"Which file extension is used by modern Excel workbooks?",o:[".xlsx",".docx",".pptx",".pdf"],a:0,e:".docx is Word, .pptx is PowerPoint."},
+{t:"t6",q:"Which shortcut opens the search (Find) function in most programs?",o:["Ctrl + F","Ctrl + S","Ctrl + N","Ctrl + W"],a:0,e:"Ctrl + S saves, Ctrl + N opens a new file, Ctrl + W closes a window."},
+
+// ===== Bővítés: t7 =====
+{t:"t7",q:"Since when has the EU Charter of Fundamental Rights been legally binding?",o:["Since the Treaty of Lisbon entered into force on 1 December 2009","Since it was proclaimed in 2000","Since 1950","Since 2019"],a:0,e:"It has the same legal value as the Treaties."},
+{t:"t7",q:"Article 1 of the EU Charter states that:",o:["human dignity is inviolable and must be respected and protected","everyone has the right to work","the EU has legal personality","Member States may derogate from all rights"],a:0,e:"Human dignity is the foundation of all other Charter rights."},
+{t:"t7",q:"Which article of the EU Charter guarantees the right to asylum?",o:["Article 18","Article 19","Article 21","Article 47"],a:0,e:"Article 18, with due respect for the 1951 Refugee Convention."},
+{t:"t7",q:"Article 47 of the EU Charter guarantees:",o:["the right to an effective remedy and to a fair trial","the right to asylum","freedom of movement","the right to vote"],a:0,e:"Relevant for appeals against refusals of entry, return decisions and complaints."},
+{t:"t7",q:"Under Article 52 of the Charter, limitations on rights must:",o:["be provided for by law, respect the essence of the right and be proportionate","be decided by any public officer","never be applied","be approved by the UN"],a:0,e:"This is the general limitation clause; absolute rights such as the ban on torture cannot be limited."},
+{t:"t7",q:"The EU Charter applies to Member States:",o:["only when they are implementing EU law","in all their actions","never","only in criminal cases"],a:0,e:"Article 51; border control under the Schengen Borders Code is implementing EU law, so the Charter applies."},
+{t:"t7",q:"Where is the EU Agency for Fundamental Rights (FRA) based?",o:["Vienna","Warsaw","Strasbourg","The Hague"],a:0,e:"Strasbourg hosts the European Court of Human Rights (Council of Europe)."},
+{t:"t7",q:"The Frontex Consultative Forum on fundamental rights:",o:["gives independent advice on fundamental rights to the Executive Director and Management Board","decides on complaints","commands joint operations","adopts EU legislation"],a:0,e:"Article 108; members include EU agencies, international organisations and civil society."},
+{t:"t7",q:"Who must submit a serious incident report about a possible fundamental rights violation in a Frontex activity?",o:["Any participant in the activity who becomes aware of it","Only the Executive Director","Only the host Member State's minister","Only the person affected"],a:0,e:"The duty to report applies to all participants."},
+{t:"t7",q:"According to the 1951 Refugee Convention, a refugee has a well-founded fear of persecution for reasons of:",o:["race, religion, nationality, membership of a particular social group or political opinion","poverty","natural disasters","unemployment"],a:0,e:"Article 1A(2) of the Convention."},
+{t:"t7",q:"Which instrument prohibits the collective expulsion of aliens under the ECHR system?",o:["Article 4 of Protocol No. 4 to the ECHR","Article 2 ECHR","Article 8 ECHR","Article 6 ECHR"],a:0,e:"Article 2 is the right to life, Article 6 a fair trial, Article 8 private and family life."},
+{t:"t7",q:"In Hirsi Jamaa and Others v Italy (2012), the European Court of Human Rights found that returning migrants intercepted at sea to Libya violated:",o:["Article 3 ECHR and the prohibition of collective expulsion","no provision, because it happened at sea","only data protection rules","only the right to marry"],a:0,e:"Human rights obligations apply wherever a State exercises jurisdiction, including on the high seas."},
+{t:"t7",q:"Which of these persons is considered vulnerable and needs special attention at the border?",o:["An unaccompanied minor","A business traveller with a valid visa","An EU citizen on holiday","A cargo ship captain"],a:0,e:"Others include victims of trafficking, persons with disabilities, pregnant women and victims of torture."},
+{t:"t7",q:"The main EU legal act on preventing and combating trafficking in human beings is:",o:["Directive 2011/36/EU","Directive 2008/115/EC","Regulation (EU) 2016/399","Regulation (EU) 2019/1896"],a:0,e:"Border guards play a key role in identifying and referring victims."},
+{t:"t7",q:"Article 21 of the EU Charter prohibits:",o:["discrimination on grounds such as sex, race, ethnic origin, religion, disability, age or sexual orientation","all border checks","collective bargaining","the use of personal data"],a:0,e:"Profiling based only on such grounds is unlawful."},
+
+// ===== Referenciaanyag: t8 stratégiák és EU-prioritások =====
+{t:"t8",q:"'ProtectEU', the European Internal Security Strategy, was presented by the Commission in:",o:["April 2025","June 2024","March 2023","January 2027"],a:0,e:"Communication COM(2025) 148 of 1 April 2025."},
+{t:"t8",q:"According to ProtectEU, the European Border and Coast Guard should grow over time to:",o:["30,000 staff","10,000 staff","50,000 staff","15,000 staff"],a:0,e:"ProtectEU announced a 2026 legislative proposal to reinforce Frontex and a tripling of the European Border and Coast Guard to 30,000 over time."},
+{t:"t8",q:"Which is one of the three guiding principles of ProtectEU?",o:["A whole-of-society approach to security","Ending all checks at the external borders","Replacing national police forces with Europol","Transferring internal security to NATO"],a:0,e:"The other two: mainstreaming security in all EU policies, and investing more in security."},
+{t:"t8",q:"What does ProtectEU plan for Europol?",o:["A 2026 proposal to make it a truly operational police agency with a broader mandate","Merging it with Frontex","Closing it down","Moving it under the Council of Europe"],a:0,e:"The broader mandate would also cover sabotage, hybrid threats and information manipulation."},
+{t:"t8",q:"According to ProtectEU, around what share of criminal investigations rely on access to digital information?",o:["About 85%","About 25%","About 50%","Almost none"],a:0,e:"This is why lawful access to data is a key strand of the strategy."},
+{t:"t8",q:"The next EMPACT cycle against serious and organised crime covers:",o:["2026–2029","2022–2025","2028–2034","2025–2027"],a:0,e:"EMPACT is the EU's multidisciplinary platform against criminal threats."},
+{t:"t8",q:"Which countries does ProtectEU name as having weaponised migration against the EU?",o:["Russia, together with Belarus","Morocco and Tunisia","Türkiye and Syria","Libya and Egypt"],a:0,e:"The EU responds with sanctions, such as asset freezes and travel bans, against those involved."},
+{t:"t8",q:"According to Frontex's Annual Risk Analysis 2025–2026, a growing challenge at air borders is:",o:["fraudulent documents, visa misuse and use of less-controlled airports","a sharp fall in passenger numbers","the end of visa requirements","the closure of regional airports"],a:0,e:"The Annual Risk Analysis 2025–2026 was published in June 2025."},
+{t:"t8",q:"According to the Annual Risk Analysis 2025–2026, criminal smuggling groups are increasingly:",o:["agile, using digital tools and drones","disappearing from the EU's borders","relying only on sea routes","cooperating with border authorities"],a:0,e:"Frontex expects continued pressure and a widening mix of security threats."},
+{t:"t8",q:"At the EU's eastern borders, the Annual Risk Analysis 2025–2026 highlights:",o:["migration being used as a pressure tool, adding hybrid threats","the complete absence of irregular crossings","a new free-movement zone with Russia","the end of Schengen checks"],a:0,e:"Disinformation, sabotage and efforts to destabilise the EU are also named as concerns."},
+{t:"t8",q:"Which factor does the Annual Risk Analysis 2025–2026 link to new routes on the southern side?",o:["Instability and worsening humanitarian conditions across the Sahel","Lower ferry prices","New Schengen members","The launch of ETIAS"],a:0,e:"External influence in Africa and the expansion of smuggling networks are also mentioned."},
+{t:"t8",q:"Who adopted the Technical and Operational Strategy for European Integrated Border Management 2023–2027?",o:["The Frontex Management Board, in September 2023","The European Parliament","The Council of the EU","The European Court of Auditors"],a:0,e:"Management Board Decision 30/2023 of 20 September 2023; it was adopted unanimously."},
+{t:"t8",q:"The multiannual strategic policy for European integrated border management 2023–2027 was set out in:",o:["a Commission communication of March 2023","a Frontex Management Board decision","a Council regulation","a judgment of the Court of Justice"],a:0,e:"Frontex then prepared its Technical and Operational Strategy, and Member States align their national strategies."},
+{t:"t8",q:"How many components make up European integrated border management?",o:["15","5","8","27"],a:0,e:"Border control sits at the centre; other components include search and rescue, risk analysis, cooperation and return."},
+{t:"t8",q:"In the EIBM policy cycle, what must Member States do?",o:["Align their national integrated border management strategies with the EU policy and the Frontex strategy","Adopt their own rules independent of the EU","Hand border control to Frontex","Wait for the Court of Justice to decide"],a:0,e:"EIBM is a shared responsibility of the Member States and Frontex."},
+{t:"t8",q:"When is the next multiannual EIBM policy cycle, for 2028–2033, expected to be adopted?",o:["In 2027","In 2023","In 2030","It has been cancelled"],a:0,e:"The 2023–2027 cycle was evaluated in 2026 to prepare the next one."},
+{t:"t8",q:"The Frontex Capability Roadmap is:",o:["annexed to the Technical and Operational Strategy for EIBM","a Council regulation on visas","a list of Frontex vacancies","a Schengen evaluation report"],a:0,e:"It sets out the long-term development of the capabilities needed for EIBM."},
+{t:"t8",q:"Integrated planning under Regulation 2019/1896 includes:",o:["operational planning, contingency planning and capability development planning","only financial planning","only recruitment planning","only training planning"],a:0,e:"The Capability Roadmap follows from capability development planning."},
+{t:"t8",q:"How many priority areas does the European Council's strategic agenda 2024–2029 have?",o:["3","7","5","10"],a:0,e:"A free and democratic Europe; a strong and secure Europe; a prosperous and competitive Europe."},
+{t:"t8",q:"Under which priority of the strategic agenda 2024–2029 is 'a comprehensive approach to migration and border management'?",o:["A strong and secure Europe","A prosperous and competitive Europe","A free and democratic Europe","A green and digital Europe"],a:0,e:"It sits alongside security and defence, external action and preparing for enlargement."},
+{t:"t8",q:"How many priorities did the Commission set for its 2024–2029 term?",o:["7","3","10","12"],a:0,e:"The Commission's priorities are separate from the European Council's three priority areas."},
+{t:"t8",q:"Which Commission priority 2024–2029 includes reinforcing common borders and managing migration?",o:["A new era for European Defence and Security","Sustaining our quality of life","Supporting people and our social model","A global Europe"],a:0,e:"It also covers a European Defence Union and countering threats online and offline."},
+{t:"t8",q:"When did the Commission propose the EU budget (MFF) for 2028–2034?",o:["16 July 2025","1 January 2028","14 March 2023","12 June 2026"],a:0,e:"A second package of sectoral proposals followed on 3 September 2025."},
+{t:"t8",q:"What is the approximate size of the proposed MFF 2028–2034?",o:["Almost EUR 2 trillion, about 1.26% of EU GNI","EUR 200 billion","EUR 500 billion, about 0.5% of GNI","EUR 10 trillion"],a:0,e:"This is the Commission's proposal; it still needs agreement."},
+{t:"t8",q:"How much does the proposed MFF 2028–2034 allocate to migration, border management and security?",o:["EUR 34 billion, about triple the previous period","EUR 3.4 billion","EUR 340 billion","Nothing; it is left to Member States"],a:0,e:"It covers law enforcement, external border protection and migration management under the Pact."},
+{t:"t8",q:"How is the long-term EU budget (MFF) adopted?",o:["By the Council unanimously, with the consent of the European Parliament","By the Commission alone","By qualified majority in the Council only","By a referendum in each Member State"],a:0,e:"Decisions on new own resources may also need ratification by national parliaments."},
+
+// ===== Referenciaanyag: t9 tengeri jog =====
+{t:"t9",q:"The first SOLAS Convention was adopted in 1914 in response to:",o:["the Titanic disaster","the First World War","the founding of the UN","the creation of the EU"],a:0,e:"Later versions followed in 1929, 1948, 1960 and 1974."},
+{t:"t9",q:"What does SOLAS stand for?",o:["Safety of Life at Sea","Search Operations and Legal Assistance at Sea","Schengen Operations and Land Security","Sea Organisation for Lifeboats and Safety"],a:0,e:"The International Convention for the Safety of Life at Sea."},
+{t:"t9",q:"Which version of SOLAS is in force today?",o:["SOLAS 1974, as amended","SOLAS 1914","SOLAS 1960","SOLAS 2004"],a:0,e:"SOLAS 1974 has been updated many times by amendments."},
+{t:"t9",q:"SOLAS is generally regarded as:",o:["the most important international treaty on the safety of merchant ships","an EU regulation on fisheries","a Frontex operational plan","a treaty on the law of war"],a:0,e:"It is an IMO convention; ship masters' duty to assist persons in distress is part of this tradition."},
+{t:"t9",q:"Which UN agency is responsible for SOLAS and the SAR Convention?",o:["The International Maritime Organization (IMO)","UNHCR","IOM","ICAO"],a:0,e:"ICAO is the civil aviation body; IMO deals with maritime safety."},
+{t:"t9",q:"The International Convention on Maritime Search and Rescue (SAR Convention) was adopted in:",o:["1979, in Hamburg","1914, in London","1951, in Geneva","2004, in Brussels"],a:0,e:"It entered into force on 22 June 1985."},
+{t:"t9",q:"The SAR Convention entered into force in:",o:["1985","1979","1974","2006"],a:0,e:"Adopted in 1979, in force from 22 June 1985."},
+{t:"t9",q:"Into how many search and rescue areas did the IMO divide the world's oceans?",o:["13","7","27","50"],a:0,e:"Within each area, States agree the search and rescue regions they are responsible for."},
+{t:"t9",q:"Under the SAR Convention, Rescue Coordination Centres must:",o:["operate 24 hours a day with trained staff who have a working knowledge of English","operate only in daylight","be run by Frontex","be located in each port"],a:0,e:"Rescue sub-centres can support the RCCs."},
+{t:"t9",q:"What did the 2004 amendments to the SAR Convention add?",o:["Provisions on delivering rescued persons to a place of safety","A ban on rescuing migrants","Rules on fishing quotas","Visa rules for seafarers"],a:0,e:"They also defined 'persons in distress'; they entered into force on 1 July 2006."},
+{t:"t9",q:"The IAMSAR Manual on search and rescue was developed jointly by:",o:["IMO and ICAO","Frontex and EMSA","UNHCR and IOM","NATO and the EU"],a:0,e:"It supports cooperation between maritime and aeronautical services."},
+{t:"t9",q:"Under the SAR Convention, unless otherwise agreed, a Party must allow rescue units of other Parties to:",o:["enter its territorial sea or territory immediately for search and rescue","enter only after a 7-day notice","never enter its waters","enter only with an EU visa"],a:0,e:"Speed of rescue takes priority."},
+{t:"t9",q:"The three EU agencies cooperating on coast guard functions cover:",o:["border control, fisheries control and maritime safety","asylum, return and visas","policing, justice and customs","aviation, rail and road safety"],a:0,e:"Frontex, EFCA and EMSA share information, surveillance and capacity."},
+
+// ===== Referenciaanyag: t5 magatartási kódexek és méltóság =====
+{t:"t5",q:"The Code of Conduct for all persons participating in Frontex operational activities applies:",o:["to all Frontex operational activities, including those outside EU territory","only inside the EU","only to Frontex statutory staff","only to return flights"],a:0,e:"Article 1; it is without prejudice to status agreements with non-EU countries."},
+{t:"t5",q:"You are unexpectedly called to duty after drinking alcohol off duty. Under the Code of Conduct you should:",o:["say that you have consumed alcohol and may be unfit for duty","report for duty without saying anything","drink coffee and go","refuse without explanation"],a:0,e:"Article 14: you can declare this without risk of discredit; drinking on duty is forbidden."},
+{t:"t5",q:"Under the Code of Conduct, recording operational activities for private use is:",o:["not allowed","allowed if not posted online","allowed for training","allowed with a colleague's consent"],a:0,e:"Article 9 (confidentiality); media comments also need explicit authorisation."},
+{t:"t5",q:"Using or soliciting sexual services during a Frontex operational activity is:",o:["forbidden","allowed off duty","allowed if legal in the host country","a private matter"],a:0,e:"Article 16 strictly prohibits abusive and exploitative sexual activities."},
+{t:"t5",q:"Under the Code of Conduct, team members may use force, including service weapons:",o:["with the consent of home and host Member States, in the presence of host border guards, under host national law","whenever they consider it useful","only with the consent of Frontex","under their own national law only"],a:0,e:"Article 18; force must be a last resort and not exceed the minimum necessary."},
+{t:"t5",q:"Someone tells you their fundamental rights were violated during an operation. Under the Code of Conduct you must:",o:["give them information on the complaints mechanism and the complaint form","tell them to contact a lawyer and do nothing","ignore it if you did not see it","ask them to post it online"],a:0,e:"Article 20; you must also cooperate in gathering facts about reported incidents."},
+{t:"t5",q:"If a seconded national officer seriously breaches the Code of Conduct, what happens?",o:["The case is referred to the Member State for disciplinary measures, and the Executive Director may remove the officer from the activity","Nothing, because Frontex has no power over them","Frontex dismisses them from their national service","The host Member State prosecutes them automatically"],a:0,e:"Article 21; for Frontex staff, the Executive Director takes the measures."},
+{t:"t5",q:"Should participants show that they take part in a Frontex operation?",o:["Yes, unless it would compromise their safety or a justified operational aim","Never","Only on social media","Only when off duty"],a:0,e:"Article 6 (performance of duties)."},
+{t:"t5",q:"Under the Code of Conduct for Return Operations, which coercive measure is prohibited?",o:["Any measure that compromises the returnee's ability to breathe normally","Handcuffs listed in advance","Escorts sitting next to the returnee","Informing the returnee about the flight"],a:0,e:"Article 7(3); long-term restraint must be reviewed periodically by the escort leader."},
+{t:"t5",q:"May sedatives be used to make a removal easier?",o:["No, except for emergency medical measures to ensure flight safety under medical supervision","Yes, always","Yes, if the escort leader agrees","Yes, if the returnee resists"],a:0,e:"Article 7(4) of the Code of Conduct for Return Operations."},
+{t:"t5",q:"A returnee is not fit to travel. What happens?",o:["The person may not be removed; the host Member State must refuse their participation","The person travels anyway","Frontex decides on the spot","The escort leader gives medication"],a:0,e:"Article 8 (fitness to travel)."},
+{t:"t5",q:"During a return operation, forced-return monitors:",o:["may report irregularities but must not interfere with the operation","command the escorts","decide on coercive measures","are not allowed to see the returnees"],a:0,e:"Monitoring covers the whole operation, from pre-departure to handover."},
+{t:"t5",q:"A returnee refuses to board the aircraft. Under the Code of Conduct for Return Operations, escorts:",o:["must not threaten them to make them board or punish them for refusing","may threaten them with longer detention","may punish them after landing","must use force immediately"],a:0,e:"Article 7(6), without prejudice to legal sanctions under national law."},
+{t:"t5",q:"How many doctors should be present, at minimum, during a return operation?",o:["At least one, provided by the organising Member State","None","One per returnee","One per escort"],a:0,e:"Article 14; suitable interpreters must also be provided."},
+{t:"t5",q:"Which article of the EU Staff Regulations prohibits psychological and sexual harassment?",o:["Article 12a","Article 24","Article 86","Article 1d"],a:0,e:"Frontex applies it through Management Board Decision 16/2019."},
+{t:"t5",q:"Under the Frontex anti-harassment policy, the informal procedure relies on:",o:["confidential counsellors","the police","the European Ombudsman","the press office"],a:0,e:"The formal procedure is a request for assistance under Article 24 of the Staff Regulations."},
+{t:"t5",q:"Psychological harassment under the Staff Regulations means improper conduct that is:",o:["repetitive or systematic over a period and undermines a person's dignity or integrity","a single disagreement about work","any criticism of performance","a missed deadline"],a:0,e:"It can be behaviour, words, writing or gestures; sexual harassment is unwanted conduct relating to sex."},
+
+// ===== Referenciaanyag: t1 Standing Corps profilok =====
+{t:"t1",q:"Who adopts the profiles to be made available to the standing corps each year, such as for 2026?",o:["The Frontex Management Board","The Executive Director alone","The European Commission","The Council of the EU"],a:0,e:"Management Board Decision 6/2025 set the profiles for 2026."},
+{t:"t1",q:"Which tasks are typical for Standing Corps officers?",o:["Border checks and surveillance, screening, registration, fingerprinting and debriefing","Deciding asylum applications","Judging criminal cases","Issuing Schengen visas"],a:0,e:"They have executive powers and may carry a service weapon, under the host country's command."},
+{t:"t1",q:"In its 2025–2026 recruitment, up to how many Standing Corps officers did Frontex plan to recruit from the FGIV and AD8 profiles?",o:["400","40","4,000","1,000"],a:0,e:"Category 1 officers are employed directly by Frontex."}
+];
+Q.forEach((x,i)=>x.id=i);
+
+const RANKS=[
+ {x:0,n:"Kadét",i:"🎓"},{x:100,n:"Járőr",i:"🥾"},{x:300,n:"Határrendész",i:"🛂"},
+ {x:600,n:"Tapasztalt határrendész",i:"🧭"},{x:1000,n:"Standing Corps tiszt",i:"🛡️"},
+ {x:1600,n:"Frontex-szakértő",i:"🦅"},{x:2500,n:"Schengen legendája",i:"⭐"}
+];
+const EXAM=new Date(2027,0,12);
+const KEY="hataror-akademia-v1";
+let S={xp:0,streak:0,last:null,mastered:{},wrong:{}};
+function load(){try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+load();
+
+const $=id=>document.getElementById(id);
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function rankOf(xp){let r=0;RANKS.forEach((k,i)=>{if(xp>=k.x)r=i});return r}
+function today(){const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
+function touchStreak(){const t=today();if(S.last===t)return;const y=new Date();y.setDate(y.getDate()-1);const ys=y.getFullYear()+"-"+(y.getMonth()+1)+"-"+y.getDate();S.streak=(S.last===ys)?S.streak+1:1;S.last=t;save();if(S.streak>1)toast("🔥 "+S.streak+" napos sorozat!")}
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("on"),2200)}
+function flyXp(n,el){if(!el)return;const r=el.getBoundingClientRect();const f=document.createElement("div");f.className="xpfly";f.textContent="+"+n+" XP";f.style.left=(r.right-80)+"px";f.style.top=(r.top)+"px";document.body.appendChild(f);setTimeout(()=>f.remove(),1000)}
+function addXp(n,el){const before=rankOf(S.xp);S.xp+=n;save();flyXp(n,el);const after=rankOf(S.xp);if(after>before)setTimeout(()=>toast(RANKS[after].i+" Előléptetés: "+RANKS[after].n+"!"),400)}
+function show(id){["home","quiz","result"].forEach(s=>$(s).classList.toggle("hide",s!==id));window.scrollTo(0,0)}
+
+function renderHome(){
+ const r=rankOf(S.xp),cur=RANKS[r],nx=RANKS[r+1];
+ $("rIcon").textContent=cur.i;$("rName").textContent=cur.n;
+ if(nx){$("rNext").textContent=(S.xp-cur.x)+" / "+(nx.x-cur.x)+" XP – következő: "+nx.n;$("rBar").style.width=Math.min(100,(S.xp-cur.x)/(nx.x-cur.x)*100)+"%"}
+ else{$("rNext").textContent="Elérted a legmagasabb rangot!";$("rBar").style.width="100%"}
+ $("sXp").textContent=S.xp;
+ const y=new Date();y.setDate(y.getDate()-1);const ys=y.getFullYear()+"-"+(y.getMonth()+1)+"-"+y.getDate();
+ $("sStreak").textContent=((S.last===today()||S.last===ys)?S.streak:0)+"🔥";
+ const days=Math.ceil((EXAM-new Date(new Date().toDateString()))/864e5);$("sDays").textContent=days>0?days:"Ma!";
+ const wc=Object.keys(S.wrong).length;$("wrongLbl").textContent=wc?wc+" kérdés vár javításra":"Még nincs hibás kérdésed – szép munka!";
+ const tp=$("topics");tp.innerHTML="";
+ Object.keys(TOPICS).forEach(k=>{const qs=Q.filter(q=>q.t===k),m=qs.filter(q=>S.mastered[q.id]).length,p=Math.round(m/qs.length*100);
+  const b=document.createElement("button");b.className="topic";
+  b.innerHTML=`<div class="wk">${TOPICS[k].w}${p===100?" · ✅":""}</div><b>${TOPICS[k].n}</b><div class="bar"><i style="width:${p}%"></i></div><div class="pc">${m}/${qs.length} elsajátítva</div>`;
+  b.onclick=()=>start("practice",k);tp.appendChild(b)});
+}
+
+// ----- quiz engine -----
+let G=null,timerH=null;
+function start(mode,topic){
+ let pool;
+ if(mode==="practice")pool=shuffle(Q.filter(q=>q.t===topic));
+ else if(mode==="blitz")pool=shuffle(Q).slice(0,10);
+ else if(mode==="exam")pool=shuffle(Q).slice(0,50);
+ else if(mode==="wrong"){pool=shuffle(Q.filter(q=>S.wrong[q.id]));if(!pool.length){toast("Nincs hibás kérdés – próbálj egy Villámkört!");return}}
+ touchStreak();
+ G={mode,topic,items:pool.map(q=>({q,order:shuffle([0,1,2,3]),ans:null,done:false})),i:0,combo:0,best:0,xp:0,
+    endAt:mode==="exam"?Date.now()+35*60*1000:null};
+ $("timer").classList.toggle("hide",!(mode==="blitz"||mode==="exam"));
+ $("nav").classList.toggle("hide",mode!=="exam");
+ show("quiz");renderQ();
+ if(mode==="exam"){clearInterval(timerH);timerH=setInterval(tickExam,250)}
+}
+function label(){return G.mode==="practice"?TOPICS[G.topic].n:G.mode==="blitz"?"Villámkör":G.mode==="exam"?"Vizsgaszimuláció":"Hibajavító bevetés"}
+function pts(){let p=0;G.items.forEach(it=>{if(it.ans===null)return;p+=it.ans===it.q.a?0.2:-0.1});return Math.round(p*10)/10}
+function renderQ(){
+ const it=G.items[G.i],n=G.items.length;
+ $("qBar").style.width=((G.i)/n*100)+"%";
+ $("qCount").textContent=label()+" · "+(G.i+1)+"/"+n;
+ $("qScore").textContent=(G.mode==="blitz")?pts().toFixed(1)+" pont":"";
+ $("qTag").textContent=TOPICS[it.q.t].n;
+ $("qText").textContent=it.q.q;
+ $("combo").textContent=G.combo>=3&&G.mode!=="exam"?"🔥 "+G.combo+"-es széria · bónusz XP":"";
+ const box=$("opts");box.innerHTML="";
+ it.order.forEach((oi,k)=>{const b=document.createElement("button");b.className="opt";b.dataset.oi=oi;
+  b.innerHTML=`<span class="k">${"ABCD"[k]}</span><span>${it.q.o[oi]}</span>`;
+  b.onclick=()=>choose(oi,b);box.appendChild(b)});
+ $("fb").innerHTML="";
+ if(G.mode==="exam"){renderExamQ();return}
+ $("acts").innerHTML="";
+ const sk=document.createElement("button");sk.className="btn ghost";sk.textContent="Kihagyom (0 pont)";sk.onclick=()=>choose(null,null);$("acts").appendChild(sk);
+ if(G.mode==="blitz")startBlitzTimer();
+}
+function startBlitzTimer(){clearInterval(timerH);let left=42;const t=$("timer");t.textContent="0:42";t.classList.remove("warn");
+ timerH=setInterval(()=>{left--;t.textContent="0:"+String(Math.max(0,left)).padStart(2,"0");t.classList.toggle("warn",left<=10);if(left<=0){clearInterval(timerH);choose(null,null,true)}},1000)}
+function choose(oi,btn,timeout){
+ const it=G.items[G.i];
+ if(G.mode==="exam"){it.ans=oi;[...$("opts").children].forEach(b=>b.classList.toggle("sel",+b.dataset.oi===oi));renderNav();return}
+ if(it.done)return;it.done=true;it.ans=oi;clearInterval(timerH);
+ [...$("opts").children].forEach(b=>{b.disabled=true;const o=+b.dataset.oi;if(o===it.q.a)b.classList.add("ok");else if(o===oi)b.classList.add("bad")});
+ const ok=oi===it.q.a;let cls,title;
+ if(oi===null){cls="skip";title=timeout?"⏱️ Lejárt az idő – 0 pont":"Kihagyva – 0 pont";G.combo=0}
+ else if(ok){cls="ok";G.combo++;G.best=Math.max(G.best,G.combo);const gain=10+Math.min(10,Math.max(0,G.combo-2)*2);G.xp+=gain;addXp(gain,btn);S.mastered[it.q.id]=1;delete S.wrong[it.q.id];
+  title=["Helyes!","Pontos!","Így kell!","Telitalálat!"][Math.floor(Math.random()*4)]+(G.mode==="blitz"?" +0,2 pont":"")}
+ else{cls="bad";G.combo=0;S.wrong[it.q.id]=1;title="Nem ez a jó válasz"+(G.mode==="blitz"?" · −0,1 pont":"")}
+ save();
+ $("fb").innerHTML=`<div class="fb ${cls}"><h3>${title}</h3>${it.q.e}</div>`;
+ $("qScore").textContent=(G.mode==="blitz")?pts().toFixed(1)+" pont":"";
+ $("acts").innerHTML="";const nb=document.createElement("button");nb.className="btn";nb.textContent=G.i<G.items.length-1?"Tovább →":"Eredmény";nb.onclick=next;$("acts").appendChild(nb);
+}
+function next(){if(G.i<G.items.length-1){G.i++;renderQ()}else finish()}
+
+// exam specifics
+function renderExamQ(){
+ const it=G.items[G.i];
+ [...$("opts").children].forEach(b=>b.classList.toggle("sel",+b.dataset.oi===it.ans));
+ const a=$("acts");a.innerHTML="";
+ const pv=document.createElement("button");pv.className="btn ghost";pv.textContent="← Előző";pv.disabled=G.i===0;pv.onclick=()=>{G.i--;renderQ()};
+ const cl=document.createElement("button");cl.className="btn ghost";cl.textContent="Törlés";cl.onclick=()=>{it.ans=null;renderQ()};
+ const nx=document.createElement("button");nx.className="btn";
+ if(G.i<G.items.length-1){nx.textContent="Következő →";nx.onclick=()=>{G.i++;renderQ()}}else{nx.textContent="Beadás";nx.onclick=submitExam}
+ a.append(pv,cl,nx);renderNav();
+}
+function renderNav(){const nv=$("nav");nv.innerHTML="";G.items.forEach((it,k)=>{const b=document.createElement("button");b.textContent=k+1;if(it.ans!==null)b.classList.add("ans");if(k===G.i)b.classList.add("cur");b.onclick=()=>{G.i=k;renderQ()};nv.appendChild(b)});
+ const answered=G.items.filter(x=>x.ans!==null).length;$("qScore").textContent=answered+" megválaszolva"}
+function tickExam(){const left=Math.max(0,G.endAt-Date.now());const m=Math.floor(left/60000),s=Math.floor(left%60000/1000);
+ const t=$("timer");t.textContent=m+":"+String(s).padStart(2,"0");t.classList.toggle("warn",left<3*60000);if(left<=0){clearInterval(timerH);finish()}}
+function submitExam(){const open=G.items.filter(x=>x.ans===null).length;
+ ask("Beadod a tesztet?",open?`${open} kérdés üresen marad (0 pont). Emlékeztető: csak akkor tippelj, ha legfeljebb két lehetőség maradt.`:"Minden kérdésre válaszoltál.",finish)}
+
+function finish(){
+ clearInterval(timerH);
+ const n=G.items.length,c=G.items.filter(x=>x.ans===x.q.a).length,w=G.items.filter(x=>x.ans!==null&&x.ans!==x.q.a).length,b=n-c-w;
+ if(G.mode==="exam"){G.items.forEach(x=>{if(x.ans===x.q.a){S.mastered[x.q.id]=1;delete S.wrong[x.q.id]}else if(x.ans!==null)S.wrong[x.q.id]=1});const gain=c*15+(pts()>=7?100:0);G.xp=gain;addXp(gain,null);save()}
+ let medal,head,score,sub;
+ if(G.mode==="exam"||G.mode==="blitz"){const p=pts(),max=n*0.2;score=(G.mode==="exam"?Math.max(0,p).toFixed(1)+" / 10":p.toFixed(1)+" / "+max.toFixed(0));
+  const ratio=p/max;medal=ratio>=0.85?"🏆":ratio>=0.7?"🥇":ratio>=0.5?"🥈":"🎯";
+  head=ratio>=0.7?"Vizsgaszint!":ratio>=0.5?"Jó úton jársz":"Gyakorlás kell még";
+  sub=G.mode==="exam"?(p>=7?"Elérted a 7+ pontos célt. +100 XP bónusz!":"Cél: 7+ pont. Nézd át a hibákat, és próbáld újra."):"A vizsgán ugyanez a pontozás: +0,2 jó, −0,1 rossz, 0 üres."}
+ else{const ratio=c/n;medal=ratio===1?"🏆":ratio>=0.7?"🥇":"📘";head=ratio===1?"Hibátlan modul!":ratio>=0.7?"Szép munka!":"Ez még ismétlést kér";score=c+" / "+n;sub="Legjobb széria: "+G.best}
+ const rv=G.items.filter(x=>x.ans!==x.q.a);
+ $("result").innerHTML=`<div class="card big"><div class="medal">${medal}</div><h2>${head}</h2><div class="score">${score}</div><p>${sub}</p>
+ <div class="rgrid"><div class="stat"><b style="color:var(--green)">${c}</b><span>helyes</span></div><div class="stat"><b style="color:var(--red)">${w}</b><span>rossz</span></div><div class="stat"><b>${b}</b><span>üres</span></div></div>
+ <p style="margin-top:12px">+${G.xp} XP ebben a körben</p></div>
+ <div class="acts"><button class="btn ghost" id="rHome">Főoldal</button><button class="btn" id="rAgain">Újra</button></div>
+ ${rv.length?`<div class="sec">Átnézendő (${rv.length})</div>`+rv.map(x=>`<div class="rev"><div class="q">${x.q.q}</div><div class="a">✓ ${x.q.o[x.q.a]}</div>${x.ans!==null?`<div class="y">✗ ${x.q.o[x.ans]}</div>`:`<div class="y" style="color:var(--amber)">– üresen hagyva</div>`}<div class="e">${x.q.e}</div></div>`).join(""):""}`;
+ $("rHome").onclick=()=>{renderHome();show("home")};
+ $("rAgain").onclick=()=>start(G.mode,G.topic);
+ show("result");
+}
+
+// modal
+function ask(t,m,yes){$("mTitle").textContent=t;$("mText").textContent=m;$("modal").classList.remove("hide");$("mYes").onclick=()=>{$("modal").classList.add("hide");yes()};$("mNo").onclick=()=>$("modal").classList.add("hide")}
+$("quitBtn").onclick=()=>ask("Kilépsz?","A kör eredménye elvész, de a megszerzett XP megmarad.",()=>{clearInterval(timerH);renderHome();show("home")});
+document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>start(b.dataset.mode));
+$("resetBtn").onclick=()=>ask("Törlöd a haladást?","Az XP, a rang és az elsajátított kérdések nullázódnak.",()=>{S={xp:0,streak:0,last:null,mastered:{},wrong:{}};save();renderHome()});
+renderHome();
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+</script>
+</body>
+</html>
