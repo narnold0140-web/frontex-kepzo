@@ -149,6 +149,11 @@ h1,h2,h3{font-family:Sora,Inter,sans-serif}
 .chip.on{outline:2px solid var(--gold);outline-offset:2px}
 .chip.rel{border-color:var(--blue);background:#17386b}
 .chip.dim{opacity:.35}
+.li{display:block;width:100%;text-align:left;padding:10px 2px;border-top:1px solid #24467a66}
+.li:first-of-type{border-top:0}
+.li b{display:block;font-size:14px}
+.li span{display:block;font-size:13px;color:var(--text);opacity:.85;margin-top:2px;line-height:1.4}
+.li i{display:block;font-style:normal;font-size:11px;color:var(--muted);margin-top:3px}
 .maptip{font-size:13px;color:var(--muted);margin:2px 0 12px;line-height:1.45}
 .ns{position:fixed;inset:0;z-index:10;background:#0008;display:flex;align-items:flex-end;animation:fadein .2s}
 .ns .sheet{width:100%;max-width:640px;margin:0 auto;max-height:82vh;display:flex;flex-direction:column;background:linear-gradient(180deg,var(--card2),var(--bg2));border:1px solid var(--line);border-bottom:0;border-radius:22px 22px 0 0;padding:12px 18px calc(18px + env(safe-area-inset-bottom))}
@@ -230,9 +235,10 @@ h1,h2,h3{font-family:Sora,Inter,sans-serif}
     <div class="qhead">
       <button class="x" id="mQuit" aria-label="Kilépés">✕</button>
       <div class="prog"><b style="font-family:Sora">Relationship map</b></div>
-      <button class="x" id="mReset" aria-label="Kijelölés törlése" style="font-size:15px">↺</button>
+      <button class="x" id="mView" style="width:auto;padding:0 12px;font-size:13px;font-weight:700">List</button>
+      <button class="x" id="mReset" aria-label="Reset" style="font-size:15px">↺</button>
     </div>
-    <p class="maptip">Tap an item to open its details; everything connected to it lights up in blue on the map.</p>
+    <p class="maptip">Tap an item to open its details; everything connected to it lights up in blue. Switch to List for a one-line summary of each.</p>
     <div id="mapBody"></div>
   </section>
 
@@ -796,8 +802,12 @@ const NODES={
  coe:{g:"intl",n:"Council of Europe",en:"Not an EU body!",seat:"Strasbourg",what:["European Convention on Human Rights (ECHR)","European Court of Human Rights (e.g. Hirsi Jamaa, 2012)"],fx:["Member of the Consultative Forum"],rel:["cf"]},
  imo:{g:"intl",n:"IMO",en:"International Maritime Organization",seat:"London",what:["SOLAS (1974) and the SAR Convention (1979)"],fx:["Rescue-at-sea obligations also apply in Frontex sea operations"],rel:["emsa","frontex"]}
 };
+const ONE={ep:"Directly elected; co-legislator and budgetary authority with the Council",euco:"Heads of state or government; sets the EU's political direction, does not legislate",council:"National ministers; co-legislator with the Parliament, concludes international agreements",com:"Proposes laws, implements them and guards the Treaties",cjeu:"Ensures EU law is interpreted and applied the same way everywhere",ecb:"Runs the euro's monetary policy",eca:"External auditor of EU income and spending",omb:"Investigates maladministration by EU bodies",edps:"Supervises how EU bodies process personal data",olaf:"Investigates fraud and corruption against the EU budget",frontex:"EU agency supporting Member States in managing the external borders and return",mb:"Frontex governing body: appoints the Executive Director and the FRO, adopts strategy and profiles",ed:"Runs Frontex day to day; can suspend operations for rights violations",fro:"Independent fundamental rights watchdog inside Frontex; runs the complaints mechanism",cf:"Gives Frontex independent fundamental rights advice",sc:"The EU's uniformed border and coast guard force (up to 10,000 by 2027)",europol:"Supports police cooperation against serious crime and terrorism",euaa:"Supports Member States on asylum and reception",eulisa:"Operates the EU's large IT systems (SIS, VIS, Eurodac, EES, ETIAS)",fra:"Gives expert advice on fundamental rights",eurojust:"Coordinates prosecutors in cross-border criminal cases",cepol:"Trains law enforcement officers",emsa:"Maritime safety and pollution response",efca:"Fisheries control",ms:"Primarily responsible for their own borders; host deployed teams",third:"Cooperate with Frontex via status agreements or working arrangements",unhcr:"UN Refugee Agency",iom:"UN migration agency",interpol:"Global police cooperation; runs the SLTD document database",coe:"Human rights organisation (ECHR, Strasbourg court) – not an EU body",imo:"UN maritime agency behind SOLAS and the SAR Convention"};
+let mapList=false;
 let selNode=null;
-function renderMap(){const w=$("mapBody");w.innerHTML=MAPG.map(g=>`<div class="mg"><div class="mgh"><b>${g.n}</b><span>${g.s}</span></div><div class="chips">${Object.entries(NODES).filter(([k,v])=>v.g===g.id).map(([k,v])=>`<button class="chip${k==="frontex"?" fx":""}${selNode===k?" on":""}${selNode&&NODES[selNode].rel.includes(k)?" rel":""}${selNode&&selNode!==k&&!NODES[selNode].rel.includes(k)?" dim":""}" data-k="${k}">${v.n}</button>`).join("")}</div></div>`).join("");
+function renderMap(){const w=$("mapBody");$("mView").textContent=mapList?"Map":"List";
+ if(mapList){w.innerHTML=MAPG.map(g=>`<div class="mg"><div class="mgh"><b>${g.n}</b><span>${g.s}</span></div>${Object.entries(NODES).filter(([k,v])=>v.g===g.id).map(([k,v])=>`<button class="li" data-k="${k}"><b>${v.n}</b><span>${ONE[k]}</span><i>📍 ${v.seat}</i></button>`).join("")}</div>`).join("");w.querySelectorAll(".li").forEach(b=>b.onclick=()=>openNode(b.dataset.k));return}
+w.innerHTML=MAPG.map(g=>`<div class="mg"><div class="mgh"><b>${g.n}</b><span>${g.s}</span></div><div class="chips">${Object.entries(NODES).filter(([k,v])=>v.g===g.id).map(([k,v])=>`<button class="chip${k==="frontex"?" fx":""}${selNode===k?" on":""}${selNode&&NODES[selNode].rel.includes(k)?" rel":""}${selNode&&selNode!==k&&!NODES[selNode].rel.includes(k)?" dim":""}" data-k="${k}">${v.n}</button>`).join("")}</div></div>`).join("");
  w.querySelectorAll(".chip").forEach(b=>b.onclick=()=>openNode(b.dataset.k))}
 function openNode(k){selNode=k;renderMap();const v=NODES[k];
  $("nsBody").innerHTML=`<small>${MAPG.find(g=>g.id===v.g).n}</small><h2>${v.n}</h2><div class="nen">${v.en} · 📍 ${v.seat}</div>
@@ -811,6 +821,7 @@ $("ns").onclick=e=>{if(e.target.id==="ns")$("ns").classList.add("hide")};
 $("mapBtn").onclick=()=>{selNode=null;renderMap();show("map")};
 $("mQuit").onclick=()=>{renderHome();show("home")};
 $("mReset").onclick=()=>{selNode=null;renderMap()};
+$("mView").onclick=()=>{mapList=!mapList;renderMap();window.scrollTo(0,0)};
 
 // ----- flashcards (Leitner) -----
 const GAPS=[0,1,2,4,8,16];
