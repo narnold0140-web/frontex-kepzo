@@ -140,6 +140,26 @@ h1,h2,h3{font-family:Sora,Inter,sans-serif}
 .boxes span{font-size:11px;color:var(--muted);padding:4px 8px;border-radius:99px;background:#0a1a33;border:1px solid var(--line)}
 .btn.red{background:linear-gradient(180deg,#f07070,#d94848);color:#2a0606}
 .btn.green{background:linear-gradient(180deg,#4fd68e,#25a75f);color:#03140c}
+.mg{margin-bottom:14px;padding:12px;border-radius:16px;background:var(--card);border:1px solid var(--line)}
+.mgh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+.mgh b{font-family:Sora;font-size:14px}.mgh span{font-size:11px;color:var(--muted);text-align:right}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:8px 11px;border-radius:99px;background:#0a1a33;border:1px solid var(--line);font-size:13px;font-weight:600;transition:opacity .2s,border-color .2s}
+.chip.fx{background:linear-gradient(180deg,var(--gold),var(--gold2));color:#231800;border-color:var(--gold)}
+.chip.on{outline:2px solid var(--gold);outline-offset:2px}
+.chip.rel{border-color:var(--blue);background:#17386b}
+.chip.dim{opacity:.35}
+.maptip{font-size:13px;color:var(--muted);margin:2px 0 12px;line-height:1.45}
+.ns{position:fixed;inset:0;z-index:10;background:#0008;display:flex;align-items:flex-end;animation:fadein .2s}
+.ns .sheet{width:100%;max-width:640px;margin:0 auto;max-height:82vh;display:flex;flex-direction:column;background:linear-gradient(180deg,var(--card2),var(--bg2));border:1px solid var(--line);border-bottom:0;border-radius:22px 22px 0 0;padding:12px 18px calc(18px + env(safe-area-inset-bottom))}
+.ns .grab{width:42px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 10px}
+#nsBody{overflow:auto}
+#nsBody small{color:var(--gold);font-weight:700;letter-spacing:1px;font-size:11px;text-transform:uppercase}
+#nsBody h2{font-size:22px;margin:4px 0}
+#nsBody .nen{font-size:13px;color:var(--muted);margin-bottom:6px}
+#nsBody h4{font-family:Sora;font-size:13px;color:var(--gold);margin:14px 0 6px}
+#nsBody ul{padding-left:18px;font-size:14px;line-height:1.5}
+#nsBody li{margin-bottom:4px}
 .foot{margin-top:24px;text-align:center;font-size:12px;color:var(--muted)}
 .reset{color:var(--muted);text-decoration:underline;font-size:12px;margin-top:6px}
 .modal{position:fixed;inset:0;background:#000a;display:grid;place-items:center;z-index:10;padding:20px}
@@ -176,6 +196,7 @@ h1,h2,h3{font-family:Sora,Inter,sans-serif}
     <div class="modes">
       <button class="mode" data-mode="blitz"><div class="ic" style="background:#3a2a07">⚡</div><div><b>Villámkör</b><span>10 kérdés, 42 mp/kérdés, félpontos levonással</span></div></button>
       <button class="mode" data-mode="exam"><div class="ic" style="background:#0f2e5e">🎯</div><div><b>Vizsgaszimuláció</b><span>50 kérdés, 35 perc, pontszám 10-ből</span></div></button>
+      <button class="mode" id="mapBtn"><div class="ic" style="background:#2a1f4d">🗺️</div><div><b>Relationship map</b><span>EU institutions, bodies, agencies and Frontex</span></div></button>
       <button class="mode" id="cardsBtn"><div class="ic" style="background:#163a2c">🗂️</div><div><b>Szókártyák</b><span id="cardsLbl">Időzített ismétlés</span></div></button>
       <button class="mode" data-mode="wrong"><div class="ic" style="background:#3d1520">🩹</div><div><b>Hibajavító bevetés</b><span id="wrongLbl">A rosszul megválaszolt kérdések újra</span></div></button>
     </div>
@@ -204,6 +225,17 @@ h1,h2,h3{font-family:Sora,Inter,sans-serif}
     <div class="nav hide" id="nav"></div>
   </section>
 
+  <!-- MAP -->
+  <section id="map" class="hide">
+    <div class="qhead">
+      <button class="x" id="mQuit" aria-label="Kilépés">✕</button>
+      <div class="prog"><b style="font-family:Sora">Relationship map</b></div>
+      <button class="x" id="mReset" aria-label="Kijelölés törlése" style="font-size:15px">↺</button>
+    </div>
+    <p class="maptip">Tap an item to open its details; everything connected to it lights up in blue on the map.</p>
+    <div id="mapBody"></div>
+  </section>
+
   <!-- CARDS -->
   <section id="cards" class="hide fc">
     <div class="qhead">
@@ -220,6 +252,7 @@ h1,h2,h3{font-family:Sora,Inter,sans-serif}
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="ns hide" id="ns"><div class="sheet"><div class="grab"></div><div id="nsBody"></div><button class="btn ghost" id="nsClose" style="margin-top:12px;flex:none">Close</button></div></div>
 <div class="lvl hide" id="lvl"><div class="card"><div class="badge" id="lvIcon"></div><small>Előléptetés</small><h2 id="lvName"></h2><p id="lvNext"></p><button class="btn" id="lvOk" style="width:100%">Szolgálatra kész!</button></div></div>
 <div class="modal hide" id="modal"><div class="card"><h3 id="mTitle"></h3><p id="mText"></p><div class="acts" style="margin-top:0"><button class="btn ghost" id="mNo">Mégse</button><button class="btn" id="mYes">Igen</button></div></div></div>
 
@@ -583,7 +616,7 @@ function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clear
 function flyXp(n,el){if(!el)return;const r=el.getBoundingClientRect();const f=document.createElement("div");f.className="xpfly";f.textContent="+"+n+" XP";f.style.left=(r.right-80)+"px";f.style.top=(r.top)+"px";document.body.appendChild(f);setTimeout(()=>f.remove(),1000)}
 function addXp(n,el){const before=rankOf(S.xp);S.xp+=n;save();flyXp(n,el);const after=rankOf(S.xp);if(after>before)setTimeout(()=>showLevelUp(after),450)}
 function showLevelUp(r){const k=RANKS[r],nx=RANKS[r+1];$("lvIcon").textContent=k.i;$("lvName").textContent=k.n;$("lvNext").textContent=nx?"Következő rang: "+nx.n+" ("+nx.x+" XP)":"Elérted a legmagasabb rangot. Gratulálunk!";$("lvl").classList.remove("hide");$("lvOk").onclick=()=>{$("lvl").classList.add("hide");if(!$("home").classList.contains("hide"))renderHome()}}
-function show(id){["home","quiz","result","cards"].forEach(s=>$(s).classList.toggle("hide",s!==id));document.body.classList.toggle("inquiz",id!=="home");window.scrollTo(0,0)}
+function show(id){["home","quiz","result","cards","map"].forEach(s=>$(s).classList.toggle("hide",s!==id));document.body.classList.toggle("inquiz",id!=="home");window.scrollTo(0,0)}
 
 function renderHome(){
  const r=rankOf(S.xp),cur=RANKS[r],nx=RANKS[r+1];
@@ -720,6 +753,64 @@ function finish(){
  $("rAgain").onclick=()=>start(G.mode,G.topic);
  show("result");
 }
+
+// ----- relationship map -----
+const MAPG=[
+ {id:"inst",n:"EU institutions",s:"Art. 13 TEU – 7 institutions"},
+ {id:"body",n:"Other EU bodies",s:"Oversight and control"},
+ {id:"fxin",n:"Inside Frontex",s:"Regulation (EU) 2019/1896"},
+ {id:"agen",n:"Partner agencies",s:"Justice and home affairs, maritime"},
+ {id:"ms",n:"Member States",s:"Shared responsibility (EBCG)"},
+ {id:"intl",n:"International partners",s:"Non-EU organisations"}
+];
+const NODES={
+ ep:{g:"inst",n:"European Parliament",en:"EP",seat:"Strasbourg (also Brussels, Luxembourg)",what:["Directly elected Members","Co-legislator with the Council (ordinary legislative procedure)","Budgetary authority; gives consent to the multiannual financial framework"],fx:["Frontex is accountable to the European Parliament and the Council (2019/1896, Art. 6)","Adopted Regulation 2019/1896 together with the Council"],rel:["council","com","frontex"]},
+ euco:{g:"inst",n:"European Council",en:"Heads of state or government",seat:"Brussels",what:["Heads of state or government + its President + the Commission President","Sets political direction; does not legislate","Strategic agenda 2024–2029: 3 priority areas"],fx:["Migration and border management sit under 'A strong and secure Europe'"],rel:["council","com"]},
+ council:{g:"inst",n:"Council of the EU",en:"Ministers of the Member States",seat:"Brussels",what:["Ministers by policy area (e.g. Justice and Home Affairs Council)","Co-legislator with the Parliament","Adopts the MFF unanimously, with the Parliament's consent"],fx:["Decides on Frontex measures in a situation requiring urgent action, on a Commission proposal (Art. 42)","Concludes status agreements with non-EU countries on behalf of the EU","Frontex is accountable to it and to the Parliament (Art. 6)"],rel:["ep","com","frontex","third"]},
+ com:{g:"inst",n:"European Commission",en:"Executive of the EU",seat:"Brussels",what:["Right of legislative initiative","Guardian of the Treaties; implementation","Set the multiannual strategic policy for EIBM in a communication (March 2023)"],fx:["2 representatives on the Management Board","Proposes candidates for Executive Director","Makes proposals to the Council (Art. 42)","Runs Schengen evaluations jointly with the Member States"],rel:["mb","ed","council","ep","olaf","ms"]},
+ cjeu:{g:"inst",n:"Court of Justice of the EU",en:"CJEU",seat:"Luxembourg",what:["Uniform interpretation and application of EU law","Annulment, infringement and preliminary ruling procedures"],fx:["Frontex acts and failures to act can be challenged before the Court"],rel:["frontex"]},
+ ecb:{g:"inst",n:"European Central Bank",en:"ECB",seat:"Frankfurt",what:["Monetary policy of the euro","One of the 7 institutions"],fx:["No direct role in border management"],rel:[]},
+ eca:{g:"inst",n:"European Court of Auditors",en:"ECA",seat:"Luxembourg",what:["The EU's external auditor","Checks the collection and use of EU funds"],fx:["Audits the agencies, including Frontex"],rel:["frontex"]},
+ omb:{g:"body",n:"European Ombudsman",en:"Ombudsman",seat:"Strasbourg",what:["Investigates maladministration by EU institutions, bodies and agencies"],fx:["Several inquiries into Frontex, e.g. its complaints mechanism","Executive Director decisions on complaints can be taken to the Ombudsman"],rel:["frontex","fro"]},
+ edps:{g:"body",n:"European Data Protection Supervisor",en:"EDPS",seat:"Brussels",what:["Supervises data processing by EU bodies (Regulation 2018/1725)"],fx:["Supervisor of Frontex's personal data processing"],rel:["frontex"]},
+ olaf:{g:"body",n:"OLAF",en:"European Anti-Fraud Office",seat:"Brussels",what:["Investigates fraud and corruption against the EU's financial interests","A Commission service"],fx:["Can investigate Frontex staff; suspicions must be reported"],rel:["com","frontex"]},
+ frontex:{g:"fxin",n:"Frontex",en:"European Border and Coast Guard Agency",seat:"Warsaw",what:["Legal basis: Regulation (EU) 2019/1896 (predecessors: 2007/2004 and 2016/1624)","Supports Member States in managing the external borders (EIBM)","Joint operations, rapid border interventions, return, risk analysis, vulnerability assessment","Risk analysis (CIRAM), EUROSUR, ETIAS Central Unit"],fx:["Accountable to the European Parliament and the Council (Art. 6)","European Border and Coast Guard = Frontex + national border, coast guard and return authorities"],rel:["mb","ed","fro","cf","sc","ep","council","ms","europol","euaa","eulisa","fra","emsa","efca","third"]},
+ mb:{g:"fxin",n:"Management Board",en:"Governing body",seat:"Frontex",what:["1 representative per Member State + 2 Commission representatives","Schengen associated countries with limited voting rights"],fx:["Appoints the Executive Director (from Commission candidates)","Appoints the Fundamental Rights Officer (Art. 109)","Adopted the Technical and Operational Strategy for EIBM (Decision 30/2023)","Adopts the standing corps profiles every year (e.g. 6/2025 for 2026)","Adopted the anti-harassment policy (Decision 16/2019)"],rel:["ed","fro","com","sc","frontex"]},
+ ed:{g:"fxin",n:"Executive Director",en:"Head of the Agency",seat:"Frontex",what:["Leads Frontex, with 3 Deputy Executive Directors","Legal representative of the Agency"],fx:["Agrees the operational plan with the host Member State","Suspends or terminates an activity for serious or persistent fundamental rights violations (Art. 46)","Issues recommendations after the vulnerability assessment"],rel:["mb","fro","ms","frontex"]},
+ fro:{g:"fxin",n:"Fundamental Rights Officer",en:"FRO",seat:"Frontex",what:["Independent; appointed by the Management Board (Art. 109)","At least 40 fundamental rights monitors (Art. 110)"],fx:["Handles the complaints mechanism (Art. 111)","Forwards complaints about national officers to their home Member State","Consulted before an Art. 46 decision"],rel:["mb","ed","cf","omb","frontex"]},
+ cf:{g:"fxin",n:"Consultative Forum",en:"Fundamental rights advice",seat:"Frontex",what:["Independent advice on fundamental rights (Art. 108)","Members include EUAA, FRA, UNHCR, Council of Europe, civil society"],fx:["Advises the Executive Director and the Management Board"],rel:["ed","mb","fra","euaa","unhcr","coe"]},
+ sc:{g:"fxin",n:"Standing Corps",en:"European Border and Coast Guard Standing Corps",seat:"Deployed in Member States and non-EU countries",what:["Up to 10,000 staff by 2027","Category 1: Frontex staff (~3,000); 2: long-term secondment; 3: short-term deployment","Executive powers; may carry a service weapon"],fx:["Works under the host Member State's instructions, following the operational plan","Profiles: border guard officer, ALDO, debriefing officer, return specialist, etc."],rel:["mb","ms","third","frontex"]},
+ europol:{g:"agen",n:"Europol",en:"EU Agency for Law Enforcement Cooperation",seat:"The Hague",what:["Supports the fight against serious and organised crime and terrorism"],fx:["Cooperation on migrant smuggling and trafficking in human beings","Present in hotspots","ProtectEU: to become a truly operational police agency"],rel:["frontex","eurojust","interpol"]},
+ euaa:{g:"agen",n:"EUAA",en:"EU Agency for Asylum",seat:"Valletta",what:["Asylum and reception support (replaced EASO in 2022)"],fx:["Migration management support teams in hotspots","Member of the Consultative Forum"],rel:["frontex","cf"]},
+ eulisa:{g:"agen",n:"eu-LISA",en:"EU Agency for large-scale IT systems",seat:"Tallinn (operations: Strasbourg)",what:["Runs SIS, VIS, Eurodac, EES and ETIAS","Interoperability (ESP, MID, CIR)"],fx:["Frontex uses these systems; the ETIAS Central Unit sits within Frontex"],rel:["frontex","ms"]},
+ fra:{g:"agen",n:"FRA",en:"EU Agency for Fundamental Rights",seat:"Vienna",what:["Fundamental rights expertise for the EU and Member States"],fx:["Member of the Consultative Forum","Reports on Frontex fundamental rights safeguards"],rel:["frontex","cf","fro"]},
+ eurojust:{g:"agen",n:"Eurojust",en:"EU Agency for Criminal Justice Cooperation",seat:"The Hague",what:["Judicial cooperation in criminal matters; coordinates prosecutors"],fx:["Relevant for cross-border crime cases"],rel:["europol"]},
+ cepol:{g:"agen",n:"CEPOL",en:"EU Agency for Law Enforcement Training",seat:"Budapest",what:["Law enforcement training"],fx:["ProtectEU: supports law enforcement training"],rel:["europol"]},
+ emsa:{g:"agen",n:"EMSA",en:"European Maritime Safety Agency",seat:"Lisbon",what:["Maritime safety and pollution response"],fx:["Coast guard cooperation with Frontex and EFCA"],rel:["frontex","efca"]},
+ efca:{g:"agen",n:"EFCA",en:"European Fisheries Control Agency",seat:"Vigo",what:["Fisheries control"],fx:["Coast guard cooperation with Frontex and EMSA"],rel:["frontex","emsa"]},
+ ms:{g:"ms",n:"National authorities",en:"Member States",seat:"Member States",what:["Border, coast guard and return authorities","National Coordination Centres (EUROSUR)"],fx:["Primarily responsible for managing their borders","As host Member State, they give instructions to deployed teams","Vulnerability assessment every year","They issue return decisions"],rel:["frontex","sc","ed","com"]},
+ third:{g:"intl",n:"Non-EU countries",en:"Third countries",seat:"Outside the EU",what:["Status agreement (concluded by the EU): deployments with executive powers","Working arrangement (concluded by Frontex): technical and operational cooperation only"],fx:["E.g. Albania, Montenegro, Moldova, North Macedonia, Bosnia and Herzegovina, Serbia"],rel:["council","frontex","sc"]},
+ unhcr:{g:"intl",n:"UNHCR",en:"UN Refugee Agency",seat:"Geneva",what:["Refugee protection; guardian of the 1951 Convention"],fx:["Key partner; member of the Consultative Forum"],rel:["cf","frontex"]},
+ iom:{g:"intl",n:"IOM",en:"International Organization for Migration",seat:"Geneva",what:["The UN migration agency"],fx:["Supports voluntary return and reintegration"],rel:["frontex"]},
+ interpol:{g:"intl",n:"Interpol",en:"International Criminal Police Organization",seat:"Lyon",what:["International police cooperation"],fx:["SLTD database: stolen and lost travel documents in border checks"],rel:["europol","ms"]},
+ coe:{g:"intl",n:"Council of Europe",en:"Not an EU body!",seat:"Strasbourg",what:["European Convention on Human Rights (ECHR)","European Court of Human Rights (e.g. Hirsi Jamaa, 2012)"],fx:["Member of the Consultative Forum"],rel:["cf"]},
+ imo:{g:"intl",n:"IMO",en:"International Maritime Organization",seat:"London",what:["SOLAS (1974) and the SAR Convention (1979)"],fx:["Rescue-at-sea obligations also apply in Frontex sea operations"],rel:["emsa","frontex"]}
+};
+let selNode=null;
+function renderMap(){const w=$("mapBody");w.innerHTML=MAPG.map(g=>`<div class="mg"><div class="mgh"><b>${g.n}</b><span>${g.s}</span></div><div class="chips">${Object.entries(NODES).filter(([k,v])=>v.g===g.id).map(([k,v])=>`<button class="chip${k==="frontex"?" fx":""}${selNode===k?" on":""}${selNode&&NODES[selNode].rel.includes(k)?" rel":""}${selNode&&selNode!==k&&!NODES[selNode].rel.includes(k)?" dim":""}" data-k="${k}">${v.n}</button>`).join("")}</div></div>`).join("");
+ w.querySelectorAll(".chip").forEach(b=>b.onclick=()=>openNode(b.dataset.k))}
+function openNode(k){selNode=k;renderMap();const v=NODES[k];
+ $("nsBody").innerHTML=`<small>${MAPG.find(g=>g.id===v.g).n}</small><h2>${v.n}</h2><div class="nen">${v.en} · 📍 ${v.seat}</div>
+ <h4>What it does</h4><ul>${v.what.map(x=>`<li>${x}</li>`).join("")}</ul>
+ <h4>${k==="frontex"?"Its place in the system":"Link to Frontex"}</h4><ul>${v.fx.map(x=>`<li>${x}</li>`).join("")}</ul>
+ ${v.rel.length?`<h4>Connected to</h4><div class="chips">${v.rel.map(r=>`<button class="chip rel" data-k="${r}">${NODES[r].n}</button>`).join("")}</div>`:""}`;
+ $("nsBody").querySelectorAll(".chip").forEach(b=>b.onclick=()=>openNode(b.dataset.k));
+ $("ns").classList.remove("hide");$("nsBody").scrollTop=0}
+$("nsClose").onclick=()=>{$("ns").classList.add("hide")};
+$("ns").onclick=e=>{if(e.target.id==="ns")$("ns").classList.add("hide")};
+$("mapBtn").onclick=()=>{selNode=null;renderMap();show("map")};
+$("mQuit").onclick=()=>{renderHome();show("home")};
+$("mReset").onclick=()=>{selNode=null;renderMap()};
 
 // ----- flashcards (Leitner) -----
 const GAPS=[0,1,2,4,8,16];
