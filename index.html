@@ -130,6 +130,16 @@ h1,h2,h3{font-family:Sora,Inter,sans-serif}
 .log{display:grid;gap:6px;margin-top:4px}
 .log div{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-size:13px}
 .log b{font-family:Sora;font-size:15px}
+.fc{flex:1;display:flex;flex-direction:column}
+.flip{flex:1;min-height:300px;border-radius:20px;border:1.5px solid var(--line);background:linear-gradient(180deg,var(--card2),var(--card));padding:22px 18px;display:flex;flex-direction:column;justify-content:center;text-align:center;cursor:pointer}
+.flip .fq{font-size:19px;font-weight:600;line-height:1.45}
+.flip .fa{margin-top:18px;padding-top:16px;border-top:1px dashed var(--line);font-size:17px;color:var(--gold);font-weight:700;line-height:1.4}
+.flip .fe{margin-top:10px;font-size:14px;color:var(--muted);line-height:1.5}
+.flip .hint{margin-top:18px;font-size:13px;color:var(--muted)}
+.boxes{display:flex;gap:6px;justify-content:center;margin:10px 0 4px}
+.boxes span{font-size:11px;color:var(--muted);padding:4px 8px;border-radius:99px;background:#0a1a33;border:1px solid var(--line)}
+.btn.red{background:linear-gradient(180deg,#f07070,#d94848);color:#2a0606}
+.btn.green{background:linear-gradient(180deg,#4fd68e,#25a75f);color:#03140c}
 .foot{margin-top:24px;text-align:center;font-size:12px;color:var(--muted)}
 .reset{color:var(--muted);text-decoration:underline;font-size:12px;margin-top:6px}
 .modal{position:fixed;inset:0;background:#000a;display:grid;place-items:center;z-index:10;padding:20px}
@@ -166,6 +176,7 @@ h1,h2,h3{font-family:Sora,Inter,sans-serif}
     <div class="modes">
       <button class="mode" data-mode="blitz"><div class="ic" style="background:#3a2a07">⚡</div><div><b>Villámkör</b><span>10 kérdés, 42 mp/kérdés, félpontos levonással</span></div></button>
       <button class="mode" data-mode="exam"><div class="ic" style="background:#0f2e5e">🎯</div><div><b>Vizsgaszimuláció</b><span>50 kérdés, 35 perc, pontszám 10-ből</span></div></button>
+      <button class="mode" id="cardsBtn"><div class="ic" style="background:#163a2c">🗂️</div><div><b>Szókártyák</b><span id="cardsLbl">Időzített ismétlés</span></div></button>
       <button class="mode" data-mode="wrong"><div class="ic" style="background:#3d1520">🩹</div><div><b>Hibajavító bevetés</b><span id="wrongLbl">A rosszul megválaszolt kérdések újra</span></div></button>
     </div>
 
@@ -191,6 +202,17 @@ h1,h2,h3{font-family:Sora,Inter,sans-serif}
     <div id="fb"></div>
     <div class="acts" id="acts"></div>
     <div class="nav hide" id="nav"></div>
+  </section>
+
+  <!-- CARDS -->
+  <section id="cards" class="hide fc">
+    <div class="qhead">
+      <button class="x" id="cQuit" aria-label="Kilépés">✕</button>
+      <div class="prog"><div class="bar"><i id="cBar"></i></div><div class="lbl"><span id="cCount"></span><span id="cBox"></span></div></div>
+    </div>
+    <div class="qtag" id="cTag" style="align-self:flex-start"></div>
+    <div class="flip" id="flip"></div>
+    <div class="acts" id="cActs" style="margin-top:16px"></div>
   </section>
 
   <!-- RESULT -->
@@ -476,7 +498,7 @@ const RANKS=[
 ];
 const EXAM=new Date(2027,0,12);
 const KEY="hataror-akademia-v1";
-let S={xp:0,streak:0,last:null,mastered:{},wrong:{},exams:[]};
+let S={xp:0,streak:0,last:null,mastered:{},wrong:{},exams:[],cards:{}};
 function load(){try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 load();
@@ -490,7 +512,7 @@ function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clear
 function flyXp(n,el){if(!el)return;const r=el.getBoundingClientRect();const f=document.createElement("div");f.className="xpfly";f.textContent="+"+n+" XP";f.style.left=(r.right-80)+"px";f.style.top=(r.top)+"px";document.body.appendChild(f);setTimeout(()=>f.remove(),1000)}
 function addXp(n,el){const before=rankOf(S.xp);S.xp+=n;save();flyXp(n,el);const after=rankOf(S.xp);if(after>before)setTimeout(()=>showLevelUp(after),450)}
 function showLevelUp(r){const k=RANKS[r],nx=RANKS[r+1];$("lvIcon").textContent=k.i;$("lvName").textContent=k.n;$("lvNext").textContent=nx?"Következő rang: "+nx.n+" ("+nx.x+" XP)":"Elérted a legmagasabb rangot. Gratulálunk!";$("lvl").classList.remove("hide");$("lvOk").onclick=()=>{$("lvl").classList.add("hide");if(!$("home").classList.contains("hide"))renderHome()}}
-function show(id){["home","quiz","result"].forEach(s=>$(s).classList.toggle("hide",s!==id));document.body.classList.toggle("inquiz",id!=="home");window.scrollTo(0,0)}
+function show(id){["home","quiz","result","cards"].forEach(s=>$(s).classList.toggle("hide",s!==id));document.body.classList.toggle("inquiz",id!=="home");window.scrollTo(0,0)}
 
 function renderHome(){
  const r=rankOf(S.xp),cur=RANKS[r],nx=RANKS[r+1];
@@ -504,6 +526,7 @@ function renderHome(){
  const wc=Object.keys(S.wrong).length;$("wrongLbl").textContent=wc?wc+" kérdés vár javításra":"Még nincs hibás kérdésed – szép munka!";
  const ex=S.exams||[];$("logWrap").classList.toggle("hide",!ex.length);
  $("log").innerHTML=ex.slice(0,5).map(e=>`<div><span>${e.d.slice(5).replace("-",".")}. · ${e.c} J / ${e.w} R / ${e.b} Ü · ${Math.floor(e.t/60)} perc</span><b style="color:${e.p>=7?"var(--green)":e.p>=5?"var(--amber)":"var(--red)"}">${e.p.toFixed(1)}</b></div>`).join("")+(ex.length>1?`<div style="justify-content:center;color:var(--muted)">Legjobb: <b style="margin-left:6px">${Math.max(...ex.map(e=>e.p)).toFixed(1)} / 10</b></div>`:"");
+ const dq=cardQueue();$("cardsLbl").textContent=dq.due?dq.due+" kártya esedékes ma"+(dq.fresh?" + új kártyák":""):(dq.fresh?"Új kártyák várnak (napi 20)":"Mára minden kész ✅ – holnap jönnek az újak");
  const tp=$("topics");tp.innerHTML="";
  Object.keys(TOPICS).forEach(k=>{const qs=Q.filter(q=>q.t===k),m=qs.filter(q=>S.mastered[q.id]).length,p=Math.round(m/qs.length*100);
   const b=document.createElement("button");b.className="topic";
@@ -627,11 +650,44 @@ function finish(){
  show("result");
 }
 
+// ----- flashcards (Leitner) -----
+const GAPS=[0,1,2,4,8,16];
+function dstr(d){return d.toISOString().slice(0,10)}
+function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return dstr(d)}
+function cardQueue(){if(!S.cards)S.cards={};const t=dstr(new Date());
+ const due=shuffle(Q.filter(q=>S.cards[q.id]&&S.cards[q.id].due<=t));
+ const fresh=Q.filter(q=>!S.cards[q.id]);
+ const list=due.slice(0,20).concat(fresh.slice(0,Math.max(0,20-due.length)));
+ return{list,due:due.length,fresh:fresh.length}}
+let C=null;
+function startCards(){const q=cardQueue();if(!q.list.length){toast("Mára minden kártya kész! ✅");return}
+ touchStreak();C={list:q.list,i:0,ok:0,bad:0,open:false};show("cards");renderCard()}
+function renderCard(){const q=C.list[C.i],n=C.list.length,st=S.cards[q.id];
+ $("cBar").style.width=(C.i/n*100)+"%";$("cCount").textContent="Szókártyák · "+(C.i+1)+"/"+n;
+ $("cBox").textContent=st?"Doboz "+st.b+"/5":"Új kártya";$("cTag").textContent=TOPICS[q.t].n;
+ const f=$("flip");f.innerHTML=`<div class="fq">${q.q}</div>`+(C.open?`<div class="fa">${q.o[q.a]}</div><div class="fe">${q.e}</div>`:`<div class="hint">Gondold végig a választ, majd koppints a megfordításhoz</div>`);
+ f.onclick=()=>{if(!C.open){C.open=true;renderCard()}};
+ const a=$("cActs");a.innerHTML="";
+ if(!C.open){const b=document.createElement("button");b.className="btn";b.textContent="Megfordítom";b.onclick=f.onclick;a.appendChild(b)}
+ else{const no=document.createElement("button");no.className="btn red";no.textContent="✗ Nem tudtam";no.onclick=()=>grade(false);
+  const ys=document.createElement("button");ys.className="btn green";ys.textContent="✓ Tudtam";ys.onclick=e=>grade(true,e.currentTarget);a.append(no,ys)}}
+function grade(ok,el){const q=C.list[C.i],st=S.cards[q.id]||{b:0};
+ if(ok){st.b=Math.min(5,st.b+1);C.ok++;addXp(4,el)}else{st.b=1;C.bad++;C.list.push(q)}
+ st.due=addDays(ok?GAPS[st.b]:0);if(!ok)st.due=addDays(1);S.cards[q.id]=st;save();
+ if(!ok&&C.list.filter(x=>x===q).length>2)C.list.pop();
+ C.open=false;C.i++;if(C.i<C.list.length)renderCard();else endCards()}
+function endCards(){const t=C.ok+C.bad;
+ $("result").innerHTML=`<div class="card big"><div class="medal">🗂️</div><h2>Kártyák kész!</h2><div class="score">${C.ok} / ${t}</div><p>A „Nem tudtam” kártyák holnap újra jönnek, a tudottak egyre ritkábban (1, 2, 4, 8, 16 nap).</p></div>
+ <div class="acts"><button class="btn ghost" id="rHome">Főoldal</button><button class="btn" id="rAgain">Még egy kör</button></div>`;
+ $("rHome").onclick=()=>{renderHome();show("home")};$("rAgain").onclick=startCards;show("result")}
+$("cardsBtn").onclick=startCards;
+$("cQuit").onclick=()=>{renderHome();show("home")};
+
 // modal
 function ask(t,m,yes){$("mTitle").textContent=t;$("mText").textContent=m;$("modal").classList.remove("hide");$("mYes").onclick=()=>{$("modal").classList.add("hide");yes()};$("mNo").onclick=()=>$("modal").classList.add("hide")}
 $("quitBtn").onclick=()=>ask("Kilépsz?","A kör eredménye elvész, de a megszerzett XP megmarad.",()=>{clearInterval(timerH);renderHome();show("home")});
-document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>start(b.dataset.mode));
-$("resetBtn").onclick=()=>ask("Törlöd a haladást?","Az XP, a rang és az elsajátított kérdések nullázódnak.",()=>{S={xp:0,streak:0,last:null,mastered:{},wrong:{},exams:[]};save();renderHome()});
+document.querySelectorAll(".mode[data-mode]").forEach(b=>b.onclick=()=>start(b.dataset.mode));
+$("resetBtn").onclick=()=>ask("Törlöd a haladást?","Az XP, a rang és az elsajátított kérdések nullázódnak.",()=>{S={xp:0,streak:0,last:null,mastered:{},wrong:{},exams:[],cards:{}};save();renderHome()});
 renderHome();
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){navigator.serviceWorker.register("sw.js").catch(()=>{})}
 </script>
