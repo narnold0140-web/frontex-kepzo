@@ -170,6 +170,41 @@ h1,h2,h3{font-family:Sora,Inter,sans-serif}
 .modal{position:fixed;inset:0;background:#000a;display:grid;place-items:center;z-index:10;padding:20px}
 .modal .card{max-width:380px;width:100%}
 .modal p{color:var(--muted);font-size:14px;margin:8px 0 14px;line-height:1.45}
+/* ---- Kösd össze! ---- */
+#link{flex:1;display:flex;flex-direction:column}
+.lk-top{display:flex;justify-content:space-between;align-items:baseline;margin:4px 0 6px}
+.lk-top b{font-family:Sora;font-size:17px}
+.lk-top span{font-size:12px;color:var(--muted)}
+.lk-tbar{height:6px;border-radius:99px;background:#0a1a33;overflow:hidden;border:1px solid var(--line);margin-bottom:6px}
+.lk-tbar>i{display:block;height:100%;background:linear-gradient(90deg,var(--green),#7be3a9);transition:width .25s linear}
+.lk-tbar.low>i{background:linear-gradient(90deg,var(--red),#f59a9a)}
+.lk-hint{font-size:12.5px;color:var(--muted);margin-bottom:10px}
+.lk-board{position:relative;display:grid;grid-template-columns:40% 1fr;column-gap:34px;user-select:none;-webkit-user-select:none}
+.lk-board svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:0}
+.lk-col{display:flex;flex-direction:column;gap:8px;position:relative;z-index:1}
+.lk-col.ent{justify-content:space-around}
+.lk-it{text-align:left;padding:10px 11px;border-radius:12px;background:var(--card);border:1.5px solid var(--line);font-size:13px;line-height:1.3;transition:border-color .15s,background .15s,opacity .3s,transform .12s;min-height:44px}
+.lk-it:active{transform:scale(.97)}
+.lk-col.ent .lk-it{font-family:Sora;font-weight:600;font-size:13.5px;display:flex;align-items:center}
+.lk-it.sel{border-color:var(--gold);background:#2b2a17;box-shadow:0 0 0 3px #f5c54233}
+.lk-it.done{border-color:var(--green);background:#123f33;opacity:.78;pointer-events:none}
+.lk-it.miss{border-color:#6b7a93;border-style:dashed;opacity:.7;pointer-events:none}
+.lk-it.bad{border-color:var(--red);background:#45202a;animation:lkshake .35s}
+@keyframes lkshake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.lk-ans{display:block;margin-top:5px;color:var(--gold);font-weight:700;font-size:12px}
+.lk-line{fill:none;stroke-width:2.4;stroke-linecap:round}
+.lk-line.ok{stroke:var(--green)}
+.lk-line.miss{stroke:#8a97ad;stroke-dasharray:5 5}
+.lk-line.draw{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:lkdraw .45s ease-out forwards}
+@keyframes lkdraw{to{stroke-dashoffset:0}}
+.lk-msg{margin-top:14px}
+.lk-msg .card{text-align:center;animation:pop .4s cubic-bezier(.2,1.4,.4,1)}
+.lk-stars{font-size:30px;letter-spacing:4px;margin:4px 0}
+.lk-msg p{color:var(--muted);font-size:13px;margin:4px 0 12px}
+.lk-sum li{list-style:none;text-align:left;font-size:13px;padding:9px 0;border-top:1px solid var(--line)}
+.lk-sum li b{color:var(--green)}
+.lk-sum li s{color:var(--red);text-decoration:none}
+@media (prefers-reduced-motion:reduce){.lk-line.draw{animation:none;stroke-dashoffset:0}.lk-it.bad{animation:none}}
 </style>
 </head>
 <body>
@@ -202,6 +237,7 @@ h1,h2,h3{font-family:Sora,Inter,sans-serif}
       <button class="mode" data-mode="blitz"><div class="ic" style="background:#3a2a07">⚡</div><div><b>Villámkör</b><span>10 kérdés, 42 mp/kérdés, félpontos levonással</span></div></button>
       <button class="mode" data-mode="exam"><div class="ic" style="background:#0f2e5e">🎯</div><div><b>Vizsgaszimuláció</b><span>50 kérdés, 35 perc, pontszám 10-ből</span></div></button>
       <button class="mode" id="mapBtn"><div class="ic" style="background:#2a1f4d">🗺️</div><div><b>Relationship map</b><span>EU institutions, bodies, agencies and Frontex</span></div></button>
+      <button class="mode" id="linkBtn"><div class="ic" style="background:#3a1f12">🔗</div><div><b>Kösd össze!</b><span id="linkLbl">Intézmény ↔ szerep párosító, 6 szint</span></div></button>
       <button class="mode" id="cardsBtn"><div class="ic" style="background:#163a2c">🗂️</div><div><b>Szókártyák</b><span id="cardsLbl">Időzített ismétlés</span></div></button>
       <button class="mode" data-mode="wrong"><div class="ic" style="background:#3d1520">🩹</div><div><b>Hibajavító bevetés</b><span id="wrongLbl">A rosszul megválaszolt kérdések újra</span></div></button>
     </div>
@@ -240,6 +276,20 @@ h1,h2,h3{font-family:Sora,Inter,sans-serif}
     </div>
     <p class="maptip">Tap an item to open its details; everything connected to it lights up in blue. Switch to List for a one-line summary of each.</p>
     <div id="mapBody"></div>
+  </section>
+
+  <!-- LINK GAME -->
+  <section id="link" class="hide">
+    <div class="qhead">
+      <button class="x" id="lkQuit" aria-label="Kilépés">✕</button>
+      <div class="prog"><div class="bar"><i id="lkBar"></i></div><div class="lbl"><span id="lkLvl"></span><span id="lkScore"></span></div></div>
+    </div>
+    <div class="combo" id="lkCombo"></div>
+    <div class="lk-top"><b id="lkTheme"></b><span id="lkTime"></span></div>
+    <div class="lk-tbar" id="lkTbarW"><i id="lkTbar"></i></div>
+    <p class="lk-hint" id="lkHint">Koppints egy szereplőre, majd a hozzá tartozó leírásra (vagy fordítva).</p>
+    <div class="lk-board" id="lkBoard"><svg id="lkSvg"></svg><div class="lk-col ent" id="lkEnt"></div><div class="lk-col" id="lkClu"></div></div>
+    <div class="lk-msg" id="lkMsg"></div>
   </section>
 
   <!-- CARDS -->
@@ -912,7 +962,7 @@ function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clear
 function flyXp(n,el){if(!el)return;const r=el.getBoundingClientRect();const f=document.createElement("div");f.className="xpfly";f.textContent="+"+n+" XP";f.style.left=(r.right-80)+"px";f.style.top=(r.top)+"px";document.body.appendChild(f);setTimeout(()=>f.remove(),1000)}
 function addXp(n,el){const before=rankOf(S.xp);S.xp+=n;save();flyXp(n,el);const after=rankOf(S.xp);if(after>before)setTimeout(()=>showLevelUp(after),450)}
 function showLevelUp(r){const k=RANKS[r],nx=RANKS[r+1];$("lvIcon").textContent=k.i;$("lvName").textContent=k.n;$("lvNext").textContent=nx?"Következő rang: "+nx.n+" ("+nx.x+" XP)":"Elérted a legmagasabb rangot. Gratulálunk!";$("lvl").classList.remove("hide");$("lvOk").onclick=()=>{$("lvl").classList.add("hide");if(!$("home").classList.contains("hide"))renderHome()}}
-function show(id){["home","quiz","result","cards","map"].forEach(s=>$(s).classList.toggle("hide",s!==id));document.body.classList.toggle("inquiz",id!=="home");window.scrollTo(0,0)}
+function show(id){["home","quiz","result","cards","map","link"].forEach(s=>$(s).classList.toggle("hide",s!==id));document.body.classList.toggle("inquiz",id!=="home");window.scrollTo(0,0)}
 
 function renderHome(){
  const r=rankOf(S.xp),cur=RANKS[r],nx=RANKS[r+1];
@@ -923,6 +973,7 @@ function renderHome(){
  const y=new Date();y.setDate(y.getDate()-1);const ys=y.getFullYear()+"-"+(y.getMonth()+1)+"-"+y.getDate();
  $("sStreak").textContent=((S.last===today()||S.last===ys)?S.streak:0)+"🔥";
  const days=Math.ceil((EXAM-new Date(new Date().toDateString()))/864e5);$("sDays").textContent=days>0?days:"Ma!";
+ lkLabel();
  const wc=Object.keys(S.wrong).length;$("wrongLbl").textContent=wc?wc+" kérdés vár javításra":"Még nincs hibás kérdésed – szép munka!";
  const ex=S.exams||[];$("logWrap").classList.toggle("hide",!ex.length);
  $("log").innerHTML=ex.slice(0,5).map(e=>`<div><span>${e.d.slice(5).replace("-",".")}. · ${e.c} J / ${e.w} R / ${e.b} Ü · ${Math.floor(e.t/60)} perc</span><b style="color:${e.p>=7?"var(--green)":e.p>=5?"var(--amber)":"var(--red)"}">${e.p.toFixed(1)}</b></div>`).join("")+(ex.length>1?`<div style="justify-content:center;color:var(--muted)">Legjobb: <b style="margin-left:6px">${Math.max(...ex.map(e=>e.p)).toFixed(1)} / 10</b></div>`:"");
@@ -1108,6 +1159,154 @@ function openNode(k){selNode=k;renderMap();const v=NODES[k];
  $("ns").classList.remove("hide");$("nsBody").scrollTop=0}
 $("nsClose").onclick=()=>{$("ns").classList.add("hide")};
 $("ns").onclick=e=>{if(e.target.id==="ns")$("ns").classList.add("hide")};
+// ===== Kösd össze! (link game) =====
+const LK_CLUES={
+ ep:["Directly elected co-legislator; Frontex is accountable to it","Its Members can put written questions to the Frontex ED, answered within 15 calendar days"],
+ council:["National ministers; co-legislator with the Parliament","On a Commission proposal, can decide urgent measures for Frontex (Art. 42)"],
+ euco:["Heads of state or government; sets political direction but does not legislate","Adopted the EU strategic agenda 2024–2029"],
+ com:["Holds the right of legislative initiative","Has 2 representatives on the Frontex Management Board","Proposes the candidates for Frontex Executive Director"],
+ cjeu:["Seated in Luxembourg; ensures EU law is interpreted uniformly","Can annul Frontex acts on an action for annulment"],
+ ecb:["Runs the monetary policy of the euro"],
+ eca:["The EU's external auditor; audits Frontex accounts"],
+ omb:["Investigates maladministration by EU bodies, including Frontex"],
+ edps:["Supervises how Frontex processes personal data"],
+ olaf:["Investigates fraud and corruption against the EU budget"],
+ frontex:["Seated in Warsaw; legal basis Regulation (EU) 2019/1896"],
+ mb:["1 representative per Member State + 2 from the Commission","Appoints the Executive Director by a two-thirds majority","Adopts the standing corps profiles by 31 March each year"],
+ ed:["Agrees the operational plan with the host Member State","Decides on a rapid border intervention within 2 working days","Must suspend an activity for serious or persistent fundamental rights violations"],
+ fro:["Reviews the admissibility of complaints (Art. 111)","Appointed from three candidates; reports directly to the Management Board","Appoints the fundamental rights monitors"],
+ cf:["Gives independent fundamental rights advice to the ED and the Board (Art. 108)"],
+ sc:["Up to 10,000 operational staff by 2027, in 4 categories","10 profiles for 2026, from Border and Coast Guard Officer to Crew Member"],
+ europol:["EU law enforcement agency against serious organised crime and terrorism"],
+ euaa:["Replaced EASO in 2022; seated in Valletta"],
+ eulisa:["Runs SIS, VIS, Eurodac, EES and ETIAS","Seated in Tallinn; operations in Strasbourg"],
+ fra:["Seated in Vienna; fundamental rights expertise for the EU"],
+ eurojust:["Coordinates national prosecutors in cross-border criminal cases"],
+ cepol:["Seated in Budapest; trains law enforcement officers"],
+ emsa:["Seated in Lisbon; maritime safety and pollution response"],
+ efca:["Seated in Vigo; fisheries control"],
+ ms:["Primarily responsible for managing their own external borders","Run the National Coordination Centres of EUROSUR, 24/7"],
+ third:["Teams with executive powers need a status agreement to deploy there"],
+ unhcr:["Guardian of the 1951 Refugee Convention"],
+ iom:["The UN migration agency; supports voluntary return and reintegration"],
+ interpol:["Runs the SLTD database of stolen and lost travel documents"],
+ coe:["Not an EU body: home of the European Convention on Human Rights"],
+ imo:["Adopted SOLAS (1974) and the SAR Convention (1979)"]
+};
+const LK_THEMES=[
+ {n:"EU-intézmények",k:["ep","council","euco","com","cjeu","eca","ecb"]},
+ {n:"A Frontexen belül",k:["frontex","mb","ed","fro","cf","sc","ms"]},
+ {n:"Partnerügynökségek",k:["europol","euaa","eulisa","fra","eurojust","cepol","emsa","efca"]},
+ {n:"Felügyelet és ellenőrzés",k:["omb","edps","olaf","eca","cjeu","fro","ep"]},
+ {n:"Nemzetközi partnerek",k:["unhcr","iom","interpol","coe","imo","third","ms"]},
+ {n:"Mesterszint – minden vegyesen",k:Object.keys(LK_CLUES)}
+];
+const LK_PER=5, LK_SEC=75;
+let LK=null;
+function lkData(){if(!S.link)S.link={best:0,games:0,miss:{}};return S.link}
+function lkPickRound(th){
+ const d=lkData(), miss=d.miss;
+ const score=k=>LK_CLUES[k].reduce((a,_,i)=>a+(miss[k+":"+i]||0),0);
+ // entities with past misses first, then random
+ let pool=shuffle(th.k).sort((a,b)=>score(b)-score(a));
+ const used=new Set(LK?LK.usedClues:[]);
+ const ents=pool.slice(0,LK_PER);
+ return ents.map(k=>{
+  const idx=LK_CLUES[k].map((_,i)=>i);
+  const missed=idx.filter(i=>miss[k+":"+i]);
+  const fresh=idx.filter(i=>!used.has(k+":"+i));
+  const i=(missed.length?shuffle(missed):fresh.length?shuffle(fresh):shuffle(idx))[0];
+  return {k,ci:i,id:k+":"+i,text:LK_CLUES[k][i],done:false};
+ });
+}
+function lkStart(){
+ clearInterval(LK&&LK.tm);
+ LK={lvl:0,score:0,combo:0,stars:[],mistakes:[],usedClues:[],erred:new Set(),tm:null};
+ show("link");lkRound();
+}
+function lkRound(){
+ const th=LK_THEMES[LK.lvl];
+ LK.pairs=lkPickRound(th);LK.pairs.forEach(p=>LK.usedClues.push(p.id));
+ LK.err=0;LK.left=LK_SEC;LK.sel=null;LK.over=false;
+ $("lkTheme").textContent=th.n;$("lkLvl").textContent=(LK.lvl+1)+". szint / "+LK_THEMES.length;
+ $("lkBar").style.width=(LK.lvl/LK_THEMES.length*100)+"%";
+ $("lkMsg").innerHTML="";$("lkCombo").textContent="";lkScore();$("lkHint").classList.remove("hide");$("lkTbarW").classList.remove("hide");
+ const ents=shuffle(LK.pairs), clues=shuffle(LK.pairs);
+ $("lkEnt").innerHTML=ents.map(p=>`<button class="lk-it" data-side="e" data-k="${p.k}">${NODES[p.k].n}</button>`).join("");
+ $("lkClu").innerHTML=clues.map(p=>`<button class="lk-it" data-side="c" data-k="${p.k}">${p.text}</button>`).join("");
+ $("lkSvg").innerHTML="";
+ document.querySelectorAll("#lkBoard .lk-it").forEach(b=>b.onclick=()=>lkTap(b));
+ lkTick();clearInterval(LK.tm);LK.tm=setInterval(()=>{if(!$("lvl").classList.contains("hide")||document.hidden)return;LK.left-=.25;lkTick();if(LK.left<=0)lkEnd(true)},250);
+ window.scrollTo(0,0);
+}
+function lkTick(){const t=Math.max(0,LK.left);$("lkTime").textContent="⏱️ "+Math.ceil(t)+" mp";$("lkTbar").style.width=(t/LK_SEC*100)+"%";$("lkTbarW").classList.toggle("low",t<=15)}
+function lkScore(){$("lkScore").textContent=LK.score+" pont"}
+function lkTap(b){
+ if(LK.over)return;
+ const s=LK.sel;
+ if(!s||s.dataset.side===b.dataset.side){if(s)s.classList.remove("sel");if(s===b){LK.sel=null;return}b.classList.add("sel");LK.sel=b;return}
+ s.classList.remove("sel");LK.sel=null;
+ const e=b.dataset.side==="e"?b:s, c=b.dataset.side==="c"?b:s;
+ const pair=LK.pairs.find(p=>p.k===c.dataset.k);
+ if(e.dataset.k===c.dataset.k){
+  pair.done=true;e.classList.add("done");c.classList.add("done");
+  LK.combo++;const gain=10+Math.min(10,Math.max(0,LK.combo-2)*2);LK.score+=gain;lkScore();addXp(gain,c);
+  const m=lkData().miss;if(m[pair.id]&&!LK.erred.has(pair.id)){m[pair.id]--;if(m[pair.id]<=0)delete m[pair.id];save()}
+  $("lkCombo").textContent=LK.combo>=3?"🔥 "+LK.combo+"-es széria · bónusz XP":"";
+  lkLine(e,c,"ok",true);
+  if(LK.pairs.every(p=>p.done))lkEnd(false);
+ }else{
+  LK.err++;LK.combo=0;LK.score=Math.max(0,LK.score-3);lkScore();$("lkCombo").textContent="";
+  [e,c].forEach(x=>{x.classList.remove("bad");void x.offsetWidth;x.classList.add("bad");setTimeout(()=>x.classList.remove("bad"),400)});
+  if(navigator.vibrate)try{navigator.vibrate(60)}catch(_){}
+  LK.erred.add(pair.id);const m=lkData().miss;m[pair.id]=(m[pair.id]||0)+1;save();
+  if(!LK.mistakes.some(x=>x.id===pair.id))LK.mistakes.push({id:pair.id,text:pair.text,ok:NODES[pair.k].n,you:NODES[e.dataset.k].n});
+ }
+}
+function lkLine(e,c,cls,anim){
+ const bd=$("lkBoard").getBoundingClientRect(),a=e.getBoundingClientRect(),b=c.getBoundingClientRect();
+ const x1=a.right-bd.left,y1=a.top+a.height/2-bd.top,x2=b.left-bd.left,y2=b.top+b.height/2-bd.top,mx=(x1+x2)/2;
+ const p=document.createElementNS("http://www.w3.org/2000/svg","path");
+ p.setAttribute("d",`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);p.setAttribute("class","lk-line "+cls);
+ p.dataset.e=e.dataset.k;$("lkSvg").appendChild(p);
+ if(anim){const L=Math.ceil(p.getTotalLength());p.style.setProperty("--len",L);p.classList.add("draw")}
+}
+function lkRedraw(){if(!LK||$("link").classList.contains("hide"))return;const svg=$("lkSvg");const items=[...svg.querySelectorAll("path")].map(p=>({k:p.dataset.e,cls:p.classList.contains("miss")?"miss":"ok"}));svg.innerHTML="";
+ items.forEach(it=>{const e=document.querySelector(`#lkEnt [data-k="${it.k}"]`),c=document.querySelector(`#lkClu [data-k="${it.k}"]`);if(e&&c)lkLine(e,c,it.cls,false)})}
+window.addEventListener("resize",lkRedraw);
+function lkEnd(timeout){
+ if(LK.over)return;LK.over=true;clearInterval(LK.tm);
+ if(LK.sel){LK.sel.classList.remove("sel");LK.sel=null}
+ let star, bonus=0;
+ if(timeout){
+  star=0;
+  LK.pairs.filter(p=>!p.done).forEach(p=>{const e=document.querySelector(`#lkEnt [data-k="${p.k}"]`),c=document.querySelector(`#lkClu [data-k="${p.k}"]`);e.classList.add("miss");c.classList.add("miss");c.insertAdjacentHTML("beforeend",`<small class="lk-ans">✓ ${NODES[p.k].n}</small>`);lkLine(e,c,"miss",true);
+   const m=lkData().miss;m[p.id]=(m[p.id]||0)+1;
+   if(!LK.mistakes.some(x=>x.id===p.id))LK.mistakes.push({id:p.id,text:p.text,ok:NODES[p.k].n,you:"lejárt az idő"})});
+  save();lkRedraw();
+ }else{
+  star=LK.err===0?3:LK.err<=2?2:1;
+  bonus=Math.round(LK.left/3);if(bonus>0){LK.score+=bonus;lkScore();addXp(bonus,$("lkTime"))}
+ }
+ LK.stars.push(star);
+ const last=LK.lvl===LK_THEMES.length-1;
+ const title=timeout?"⏱️ Lejárt az idő":["","Megvan!","Szép munka!","Hibátlan!"][star];
+ $("lkMsg").innerHTML=`<div class="card"><div class="lk-stars">${"⭐".repeat(star)}${"☆".repeat(3-star)}</div><h3>${title}</h3><p>${timeout?"A szaggatott vonalak mutatják a helyes párokat – nézd meg őket.":LK.err+" hiba"+(bonus?" · +"+bonus+" pont időbónusz":"")}</p><button class="btn" id="lkNext" style="width:100%">${last?"Eredmény":"Következő szint →"}</button></div>`;
+ $("lkNext").onclick=()=>{if(last)lkFinish();else{LK.lvl++;lkRound()}};
+ setTimeout(()=>$("lkMsg").scrollIntoView({behavior:"smooth",block:"nearest"}),300);
+}
+function lkFinish(){
+ const d=lkData();d.games++;const rec=LK.score>d.best;if(rec)d.best=LK.score;save();
+ const stars=LK.stars.reduce((a,b)=>a+b,0),max=LK_THEMES.length*3;
+ $("lkBar").style.width="100%";$("lkSvg").innerHTML="";$("lkHint").classList.add("hide");$("lkTbarW").classList.add("hide");$("lkEnt").innerHTML="";$("lkClu").innerHTML="";$("lkTheme").textContent="Eredmény";$("lkTime").textContent="";$("lkCombo").textContent="";
+ const miss=LK.mistakes.length?`<ul class="lk-sum" style="margin-top:6px">${LK.mistakes.map(m=>`<li>${m.text}<br><b>✓ ${m.ok}</b>${m.you?` · <s>✗ ${m.you}</s>`:""}</li>`).join("")}</ul><p style="margin-top:10px">Ezek a következő játékban előbb jönnek elő, amíg el nem találod őket.</p>`:`<p>Egyetlen hiba sem volt – mesteri! 🏅</p>`;
+ $("lkMsg").innerHTML=`<div class="card"><div class="lk-stars">⭐ ${stars} / ${max}</div><h3>${LK.score} pont${rec?" · új rekord! 🏆":""}</h3><p>Legjobb: ${d.best} pont · ${d.games}. játék</p>${miss}<div class="acts"><button class="btn ghost" id="lkHome">Főoldal</button><button class="btn" id="lkAgain">Új játék</button></div></div>`;
+ $("lkHome").onclick=()=>{renderHome();show("home")};$("lkAgain").onclick=lkStart;
+ window.scrollTo(0,0);
+}
+$("linkBtn").onclick=lkStart;
+$("lkQuit").onclick=()=>{clearInterval(LK&&LK.tm);renderHome();show("home")};
+function lkLabel(){const d=lkData(),n=Object.keys(d.miss).length;$("linkLbl").textContent=d.games?`Rekord: ${d.best} pont${n?" · "+n+" gyakorlandó pár":""}`:"Intézmény ↔ szerep párosító, 6 szint"}
 $("mapBtn").onclick=()=>{selNode=null;renderMap();show("map")};
 $("mQuit").onclick=()=>{renderHome();show("home")};
 $("mReset").onclick=()=>{selNode=null;renderMap()};
