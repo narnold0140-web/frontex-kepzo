@@ -119,6 +119,17 @@ h1,h2,h3{font-family:Sora,Inter,sans-serif}
 .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
 .xpfly{position:fixed;font-family:Sora;font-weight:800;color:var(--gold);pointer-events:none;animation:fly 1s forwards;z-index:8}
 @keyframes fly{to{transform:translateY(-60px);opacity:0}}
+.tbl{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
+.tbl th{text-align:left;color:var(--muted);font-weight:600;padding:6px 4px;border-bottom:1px solid var(--line)}
+.tbl td{padding:8px 4px;border-bottom:1px solid #24467a66;vertical-align:middle}
+.tbl td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.tbl .mini{height:6px;border-radius:99px;background:#0a1a33;overflow:hidden;margin-top:4px}
+.tbl .mini>i{display:block;height:100%}
+.weak{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.weak button{padding:10px 12px;border-radius:12px;background:var(--card);border:1px solid var(--red);font-size:13px;font-weight:600}
+.log{display:grid;gap:6px;margin-top:4px}
+.log div{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-size:13px}
+.log b{font-family:Sora;font-size:15px}
 .foot{margin-top:24px;text-align:center;font-size:12px;color:var(--muted)}
 .reset{color:var(--muted);text-decoration:underline;font-size:12px;margin-top:6px}
 .modal{position:fixed;inset:0;background:#000a;display:grid;place-items:center;z-index:10;padding:20px}
@@ -157,6 +168,8 @@ h1,h2,h3{font-family:Sora,Inter,sans-serif}
       <button class="mode" data-mode="exam"><div class="ic" style="background:#0f2e5e">🎯</div><div><b>Vizsgaszimuláció</b><span>50 kérdés, 35 perc, pontszám 10-ből</span></div></button>
       <button class="mode" data-mode="wrong"><div class="ic" style="background:#3d1520">🩹</div><div><b>Hibajavító bevetés</b><span id="wrongLbl">A rosszul megválaszolt kérdések újra</span></div></button>
     </div>
+
+    <div id="logWrap" class="hide"><div class="sec">Próbavizsga-napló</div><div class="log" id="log"></div></div>
 
     <div class="sec">Kiképzési modulok · gyakorlás magyarázattal</div>
     <div class="topics" id="topics"></div>
@@ -463,7 +476,7 @@ const RANKS=[
 ];
 const EXAM=new Date(2027,0,12);
 const KEY="hataror-akademia-v1";
-let S={xp:0,streak:0,last:null,mastered:{},wrong:{}};
+let S={xp:0,streak:0,last:null,mastered:{},wrong:{},exams:[]};
 function load(){try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 load();
@@ -489,6 +502,8 @@ function renderHome(){
  $("sStreak").textContent=((S.last===today()||S.last===ys)?S.streak:0)+"🔥";
  const days=Math.ceil((EXAM-new Date(new Date().toDateString()))/864e5);$("sDays").textContent=days>0?days:"Ma!";
  const wc=Object.keys(S.wrong).length;$("wrongLbl").textContent=wc?wc+" kérdés vár javításra":"Még nincs hibás kérdésed – szép munka!";
+ const ex=S.exams||[];$("logWrap").classList.toggle("hide",!ex.length);
+ $("log").innerHTML=ex.slice(0,5).map(e=>`<div><span>${e.d.slice(5).replace("-",".")}. · ${e.c} J / ${e.w} R / ${e.b} Ü · ${Math.floor(e.t/60)} perc</span><b style="color:${e.p>=7?"var(--green)":e.p>=5?"var(--amber)":"var(--red)"}">${e.p.toFixed(1)}</b></div>`).join("")+(ex.length>1?`<div style="justify-content:center;color:var(--muted)">Legjobb: <b style="margin-left:6px">${Math.max(...ex.map(e=>e.p)).toFixed(1)} / 10</b></div>`:"");
  const tp=$("topics");tp.innerHTML="";
  Object.keys(TOPICS).forEach(k=>{const qs=Q.filter(q=>q.t===k),m=qs.filter(q=>S.mastered[q.id]).length,p=Math.round(m/qs.length*100);
   const b=document.createElement("button");b.className="topic";
@@ -502,16 +517,24 @@ function start(mode,topic){
  let pool;
  if(mode==="practice")pool=shuffle(Q.filter(q=>q.t===topic));
  else if(mode==="blitz")pool=shuffle(Q).slice(0,10);
- else if(mode==="exam")pool=shuffle(Q).slice(0,50);
+ else if(mode==="exam")pool=examPool(50);
  else if(mode==="wrong"){pool=shuffle(Q.filter(q=>S.wrong[q.id]));if(!pool.length){toast("Nincs hibás kérdés – próbálj egy Villámkört!");return}}
  touchStreak();
  G={mode,topic,items:pool.map(q=>({q,order:shuffle([0,1,2,3]),ans:null,done:false})),i:0,combo:0,best:0,xp:0,
-    endAt:mode==="exam"?Date.now()+35*60*1000:null};
+    endAt:mode==="exam"?Date.now()+35*60*1000:null,start:Date.now()};
  $("timer").classList.toggle("hide",!(mode==="blitz"||mode==="exam"));
  $("nav").classList.toggle("hide",mode!=="exam");
  show("quiz");renderQ();
  if(mode==="exam"){clearInterval(timerH);timerH=setInterval(tickExam,250)}
 }
+function examPool(N){
+ const keys=Object.keys(TOPICS),by={};keys.forEach(k=>by[k]=shuffle(Q.filter(q=>q.t===k)));
+ const tot=Q.length,quota={};let sum=0;
+ keys.forEach(k=>{quota[k]=Math.min(by[k].length,Math.max(2,Math.round(N*by[k].length/tot)));sum+=quota[k]});
+ const order=keys.slice().sort((a,b)=>by[b].length-by[a].length);let i=0;
+ while(sum>N){const k=order[i%order.length];if(quota[k]>2){quota[k]--;sum--}i++}
+ i=0;while(sum<N){const k=order[i%order.length];if(quota[k]<by[k].length){quota[k]++;sum++}i++}
+ let out=[];keys.forEach(k=>out=out.concat(by[k].slice(0,quota[k])));return shuffle(out)}
 function label(){return G.mode==="practice"?TOPICS[G.topic].n:G.mode==="blitz"?"Villámkör":G.mode==="exam"?"Vizsgaszimuláció":"Hibajavító bevetés"}
 function pts(){let p=0;G.items.forEach(it=>{if(it.ans===null)return;p+=it.ans===it.q.a?0.2:-0.1});return Math.round(p*10)/10}
 function renderQ(){
@@ -580,12 +603,26 @@ function finish(){
   sub=G.mode==="exam"?(p>=7?"Elérted a 7+ pontos célt. +100 XP bónusz!":"Cél: 7+ pont. Nézd át a hibákat, és próbáld újra."):"A vizsgán ugyanez a pontozás: +0,2 jó, −0,1 rossz, 0 üres."}
  else{const ratio=c/n;medal=ratio===1?"🏆":ratio>=0.7?"🥇":"📘";head=ratio===1?"Hibátlan modul!":ratio>=0.7?"Szép munka!":"Ez még ismétlést kér";score=c+" / "+n;sub="Legjobb széria: "+G.best}
  const rv=G.items.filter(x=>x.ans!==x.q.a);
+ let extra="";
+ if(G.mode==="exam"){
+  const used=Math.min(35*60,Math.round((Date.now()-G.start)/1000)),fmt=t=>Math.floor(t/60)+":"+String(t%60).padStart(2,"0");
+  const rows=Object.keys(TOPICS).map(k=>{const its=G.items.filter(x=>x.q.t===k);if(!its.length)return null;
+   const c1=its.filter(x=>x.ans===x.q.a).length,w1=its.filter(x=>x.ans!==null&&x.ans!==x.q.a).length;
+   const p1=Math.round((c1*0.2-w1*0.1)*10)/10,m1=its.length*0.2;return{k,n:its.length,c:c1,w:w1,p:p1,m:m1,r:p1/m1}}).filter(Boolean);
+  const weak=rows.slice().sort((a,b)=>a.r-b.r).slice(0,3).filter(r=>r.r<0.8);
+  S.exams=[{d:new Date().toISOString().slice(0,10),p:Math.max(0,pts()),c,w,b,t:used,weak:weak.map(r=>r.k)}].concat(S.exams||[]).slice(0,10);save();
+  extra=`<div class="sec">Idő</div><div class="card" style="font-size:14px;line-height:1.5">Felhasznált idő: <b>${fmt(used)}</b> / 35:00${used>=35*60?" – lejárt az idő.":used<20*60?" – bőven maradt időd; a kétes kérdésekre több időt is szánhatsz.":"."}</div>
+  <div class="sec">Eredmény témakörönként</div><div class="card"><table class="tbl"><tr><th>Modul</th><th style="text-align:right">J / R / Ü</th><th style="text-align:right">Pont</th></tr>
+  ${rows.map(r=>`<tr><td>${TOPICS[r.k].n}<div class="mini"><i style="width:${Math.max(0,r.r)*100}%;background:${r.r>=0.7?"var(--green)":r.r>=0.4?"var(--amber)":"var(--red)"}"></i></div></td><td class="n">${r.c} / ${r.w} / ${r.n-r.c-r.w}</td><td class="n">${r.p.toFixed(1)} / ${r.m.toFixed(1)}</td></tr>`).join("")}</table></div>
+  ${weak.length?`<div class="sec">Ezeket gyakorold</div><div class="weak">${weak.map(r=>`<button data-k="${r.k}">🩹 ${TOPICS[r.k].n}</button>`).join("")}</div>`:""}`;
+ }
  $("result").innerHTML=`<div class="card big"><div class="medal">${medal}</div><h2>${head}</h2><div class="score">${score}</div><p>${sub}</p>
  <div class="rgrid"><div class="stat"><b style="color:var(--green)">${c}</b><span>helyes</span></div><div class="stat"><b style="color:var(--red)">${w}</b><span>rossz</span></div><div class="stat"><b>${b}</b><span>üres</span></div></div>
- <p style="margin-top:12px">+${G.xp} XP ebben a körben</p></div>
+ <p style="margin-top:12px">+${G.xp} XP ebben a körben</p></div>${extra}
  <div class="acts"><button class="btn ghost" id="rHome">Főoldal</button><button class="btn" id="rAgain">Újra</button></div>
  ${rv.length?`<div class="sec">Átnézendő (${rv.length})</div>`+rv.map(x=>`<div class="rev"><div class="q">${x.q.q}</div><div class="a">✓ ${x.q.o[x.q.a]}</div>${x.ans!==null?`<div class="y">✗ ${x.q.o[x.ans]}</div>`:`<div class="y" style="color:var(--amber)">– üresen hagyva</div>`}<div class="e">${x.q.e}</div></div>`).join(""):""}`;
  $("rHome").onclick=()=>{renderHome();show("home")};
+ document.querySelectorAll("#result .weak button").forEach(b=>b.onclick=()=>start("practice",b.dataset.k));
  $("rAgain").onclick=()=>start(G.mode,G.topic);
  show("result");
 }
@@ -594,7 +631,7 @@ function finish(){
 function ask(t,m,yes){$("mTitle").textContent=t;$("mText").textContent=m;$("modal").classList.remove("hide");$("mYes").onclick=()=>{$("modal").classList.add("hide");yes()};$("mNo").onclick=()=>$("modal").classList.add("hide")}
 $("quitBtn").onclick=()=>ask("Kilépsz?","A kör eredménye elvész, de a megszerzett XP megmarad.",()=>{clearInterval(timerH);renderHome();show("home")});
 document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>start(b.dataset.mode));
-$("resetBtn").onclick=()=>ask("Törlöd a haladást?","Az XP, a rang és az elsajátított kérdések nullázódnak.",()=>{S={xp:0,streak:0,last:null,mastered:{},wrong:{}};save();renderHome()});
+$("resetBtn").onclick=()=>ask("Törlöd a haladást?","Az XP, a rang és az elsajátított kérdések nullázódnak.",()=>{S={xp:0,streak:0,last:null,mastered:{},wrong:{},exams:[]};save();renderHome()});
 renderHome();
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){navigator.serviceWorker.register("sw.js").catch(()=>{})}
 </script>
